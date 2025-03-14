@@ -1,17 +1,41 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, increment, decrement } from "@/store/store";
+import { executeQuery, initDB } from "@/lib/engine/sqlEngine";
+import { Database } from "sql.js";
+import { useState, useEffect } from "react";
 
-export default function Counter() {
-  const count = useSelector((state: RootState) => state.counter.value);
-  const dispatch = useDispatch();
-
+export default function page() {
+  const [db, setDB] = useState<Database | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    async function setupDB() {
+      try {
+        const d = await initDB();
+        setDB(d);
+      } catch (e) {
+        console.log(e);
+        setError("Failed to initialise Database");
+      } finally {
+        console.log("reached here");
+        setLoading(false);
+      }
+    }
+    setupDB();
+  }, []);
+  const generate = async () => {
+    if (!db) {
+      setError("The DB is not ready yet");
+      return;
+    }
+    const res = await executeQuery(db, "SELECT * FROM meta");
+    console.log(res);
+  };
   return (
     <div>
-      <h2>Counter: {count}</h2>
-      <button onClick={() => dispatch(increment())}>Increment</button>
-      <button onClick={() => dispatch(decrement())}>Decrement</button>
+      <h1>Bruh</h1>
+      <p>{error}</p>
+      {!loading && <button onClick={generate}>fuck</button>}
     </div>
   );
 }
