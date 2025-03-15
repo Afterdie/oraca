@@ -1,8 +1,11 @@
 import SQLEditor from "./SQLEditor";
-export default function LeftPanel() {
+
+import { SQLEditorProps } from "./SQLEditor";
+
+export default function LeftPanel({ exec }: SQLEditorProps) {
   return (
     <div className="h-full">
-      <SQLEditor />
+      <SQLEditor exec={exec} />
     </div>
   );
 }

@@ -1,24 +1,36 @@
 import { configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
+import { QueryExecResult } from "sql.js";
 
-// Example Slice (Counter)
 const inputSlice = createSlice({
   name: "query",
   initialState: { value: "--its queryin' time\nSELECT * FROM oraczen" },
   reducers: {
-    update: (state, action: PayloadAction<string>) => {
+    updateQuery: (state, action: PayloadAction<string>) => {
+      state.value = action.payload;
+    },
+  },
+});
+
+const outputSlice = createSlice({
+  name: "query",
+  initialState: { value: null as QueryExecResult[] | null },
+  reducers: {
+    updateResult: (state, action: PayloadAction<QueryExecResult[]>) => {
       state.value = action.payload;
     },
   },
 });
 
 // Export Actions
-export const { update } = inputSlice.actions;
+export const { updateQuery } = inputSlice.actions;
+export const { updateResult } = outputSlice.actions;
 
 // Create Store
 export const store = configureStore({
   reducer: {
-    input: inputSlice.reducer,
+    queryInput: inputSlice.reducer,
+    queryOutput: outputSlice.reducer,
   },
 });
 

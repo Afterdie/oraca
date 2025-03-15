@@ -1,5 +1,4 @@
-import initSqlJs from "sql.js";
-import { Database, SqlJsStatic } from "sql.js";
+import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
 
 /**
  * Initializes the SQL.js database.
@@ -26,7 +25,7 @@ export async function initDB(): Promise<Database> {
 export function executeQuery(
   db: Database,
   query: string,
-): { success: boolean; data?: any; error?: string } {
+): { success: boolean; data?: QueryExecResult[]; error?: string } {
   try {
     const result = db.exec(query);
     return { success: true, data: result };

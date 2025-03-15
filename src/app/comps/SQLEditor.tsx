@@ -4,13 +4,18 @@ import { useState } from "react";
 import Editor from "@monaco-editor/react";
 import { format } from "sql-formatter";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, update } from "@/store/store";
+import { RootState, updateQuery } from "@/store/store";
 
 //shadcn imports
 import { Button } from "@/components/ui/button";
 
-const SQLEditor = () => {
-  const value = useSelector((state: RootState) => state.input.value);
+//types
+export interface SQLEditorProps {
+  exec: (value: string) => void;
+}
+
+const SQLEditor = ({ exec }: SQLEditorProps) => {
+  const value = useSelector((state: RootState) => state.queryInput.value);
   const dispatch = useDispatch();
 
   const [isTyping, setIsTyping] = useState(false);
@@ -26,18 +31,22 @@ const SQLEditor = () => {
     }
 
     const timeout = setTimeout(() => {
-      dispatch(update(format(newValue)));
+      dispatch(updateQuery(format(newValue)));
       setIsTyping(false);
     }, 1000);
 
     setDebounceTimeout(timeout);
   };
 
+  const handleQueryExec = () => {
+    exec(value);
+  };
+
   return (
     <div className="flex h-full flex-col justify-between p-2">
       <div className="flex items-center justify-between">
         <h1>Query</h1>
-        <Button>Run</Button>
+        <Button onClick={handleQueryExec}>Run</Button>
       </div>
       <div>
         <Editor

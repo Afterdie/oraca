@@ -1,22 +1,33 @@
 "use client";
 
-import { executeQuery, initDB } from "@/lib/engine/sqlEngine";
-import { Database } from "sql.js";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateResult } from "@/store/store";
 
+//util
+import { initDB, executeQuery } from "@/lib/engine/sqlEngine";
+
+//types
+import { Database } from "sql.js";
+
+//shadcn
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+
+//comps
 import LeftPanel from "../comps/LeftPanel";
+import RightPanel from "../comps/RightPanel";
 
 export default function page() {
   const [db, setDB] = useState<Database | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  //creating db instance
+  const dispatch = useDispatch();
+
   useEffect(() => {
     async function setupDB() {
       try {
@@ -33,26 +44,30 @@ export default function page() {
     setupDB();
   }, []);
 
-  const generate = async () => {
-    if (!db) {
-      setError("The DB is not ready yet");
+  const exec = (value: string): void => {
+    const trimmedValue = value.trim();
+    if (trimmedValue == "" || !db) return;
+
+    const result = executeQuery(db, trimmedValue);
+    if (result.success) {
+      if (!result.data) return;
+      dispatch(updateResult(result.data));
       return;
     }
-    const res = await executeQuery(db, "SELECT * FROM meta");
-    console.log(res);
+    console.log(result.error);
+    //add the error toast here
+    //set the store result here
   };
 
   return (
     <div className="h-screen w-screen p-2">
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
-          <LeftPanel />
+          <LeftPanel exec={exec} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={65}>
-          <div className="flex items-center justify-center p-6">
-            <span className="font-semibold">Content</span>
-          </div>
+          <RightPanel />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
