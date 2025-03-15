@@ -65,8 +65,8 @@ export default function page() {
       <div className="absolute bottom-0 left-0 flex h-[30vh] w-full items-center justify-center">
         <TextInput />
       </div>
-      <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
-        <ResizablePanel defaultSize={35}>
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={35} className="rounded-lg border">
           <LeftPanel exec={exec} />
         </ResizablePanel>
         <ResizableHandle withHandle />

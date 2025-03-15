@@ -21,16 +21,20 @@ export default function Result() {
   console.log(duration);
   return (
     <div>
-      <div className="text-muted-foreground flex justify-between p-2">
+      <div className="text-muted-foreground mb-2 flex justify-between">
         <p>{`Displaying ${rowCount} row${rowCount === 1 ? "" : "s"}`}</p>
         <p>Executed in {duration} milliseconds</p>
       </div>
-      <div className="border-accent-foreground/45 m-2 rounded-xl border-[1px]">
+      <div className="border-accent-foreground/45 overflow-hidden rounded-xl border-[1px]">
         <Table>
           <TableHeader>
             <TableRow>
               {colHeadValue.map((c, index) => {
-                return <TableHead key={index}>{c}</TableHead>;
+                return (
+                  <TableHead key={index} className="bg-muted">
+                    {c}
+                  </TableHead>
+                );
               })}
             </TableRow>
           </TableHeader>
