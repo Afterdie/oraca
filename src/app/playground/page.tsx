@@ -4,10 +4,19 @@ import { executeQuery, initDB } from "@/lib/engine/sqlEngine";
 import { Database } from "sql.js";
 import { useState, useEffect } from "react";
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import LeftPanel from "../comps/LeftPanel";
+
 export default function page() {
   const [db, setDB] = useState<Database | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  //creating db instance
   useEffect(() => {
     async function setupDB() {
       try {
@@ -23,6 +32,7 @@ export default function page() {
     }
     setupDB();
   }, []);
+
   const generate = async () => {
     if (!db) {
       setError("The DB is not ready yet");
@@ -31,11 +41,20 @@ export default function page() {
     const res = await executeQuery(db, "SELECT * FROM meta");
     console.log(res);
   };
+
   return (
-    <div>
-      <h1>Bruh</h1>
-      <p>{error}</p>
-      {!loading && <button onClick={generate}>fuck</button>}
+    <div className="h-screen w-screen p-2">
+      <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
+        <ResizablePanel defaultSize={35}>
+          <LeftPanel />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={65}>
+          <div className="flex items-center justify-center p-6">
+            <span className="font-semibold">Content</span>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }
