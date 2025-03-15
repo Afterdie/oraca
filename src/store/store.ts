@@ -14,10 +14,17 @@ const inputSlice = createSlice({
 
 const outputSlice = createSlice({
   name: "query",
-  initialState: { value: null as QueryExecResult[] | null },
+  initialState: {
+    value: null as QueryExecResult[] | null,
+    duration: null as string | null,
+  },
   reducers: {
-    updateResult: (state, action: PayloadAction<QueryExecResult[]>) => {
-      state.value = action.payload;
+    updateResult: (
+      state,
+      action: PayloadAction<{ value: QueryExecResult[]; duration: string }>,
+    ) => {
+      state.value = action.payload.value;
+      state.duration = action.payload.duration;
     },
   },
 });

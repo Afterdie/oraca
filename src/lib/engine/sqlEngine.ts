@@ -10,9 +10,9 @@ export async function initDB(): Promise<Database> {
       "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm",
   });
   const db = new SQL.Database();
-  const initQuery = `CREATE TABLE meta (created_on TEXT DEFAULT (datetime('now')));
-  INSERT INTO meta DEFAULT VALUES;`;
-  db.exec(initQuery);
+  const initQuery = `CREATE TABLE oraczen (created_on TEXT DEFAULT (datetime('now')));
+  INSERT INTO oraczen DEFAULT VALUES;`;
+  db.run(initQuery);
   return db;
 }
 
@@ -25,10 +25,21 @@ export async function initDB(): Promise<Database> {
 export function executeQuery(
   db: Database,
   query: string,
-): { success: boolean; data?: QueryExecResult[]; error?: string } {
+): {
+  success: boolean;
+  data?: QueryExecResult[];
+  error?: string;
+  duration?: string;
+} {
   try {
+    const startTime = performance.now();
     const result = db.exec(query);
-    return { success: true, data: result };
+    const endTime = performance.now();
+    return {
+      success: true,
+      data: result,
+      duration: (endTime - startTime).toFixed(2),
+    };
   } catch (e: any) {
     return { success: false, error: e.message };
   }

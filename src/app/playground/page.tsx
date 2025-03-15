@@ -20,6 +20,7 @@ import {
 //comps
 import LeftPanel from "../comps/LeftPanel";
 import RightPanel from "../comps/RightPanel";
+import TextInput from "../comps/TextInput";
 
 export default function page() {
   const [db, setDB] = useState<Database | null>(null);
@@ -50,8 +51,8 @@ export default function page() {
 
     const result = executeQuery(db, trimmedValue);
     if (result.success) {
-      if (!result.data) return;
-      dispatch(updateResult(result.data));
+      if (!result.data || !result.duration) return;
+      dispatch(updateResult({ value: result.data, duration: result.duration }));
       return;
     }
     console.log(result.error);
@@ -60,7 +61,10 @@ export default function page() {
   };
 
   return (
-    <div className="h-screen w-screen p-2">
+    <div className="relative h-screen w-screen p-2">
+      <div className="absolute bottom-0 left-0 flex h-[30vh] w-full items-center justify-center">
+        <TextInput />
+      </div>
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
         <ResizablePanel defaultSize={35}>
           <LeftPanel exec={exec} />

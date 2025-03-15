@@ -32,6 +32,8 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
 
     const timeout = setTimeout(() => {
       dispatch(updateQuery(format(newValue)));
+      const match = newValue.match(/---(.*?)---/);
+      console.log(match);
       setIsTyping(false);
     }, 1000);
 
