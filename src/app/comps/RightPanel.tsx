@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import BlockEditor from "./BlockEditor";
 
 export default function RightPanel() {
   return (
@@ -16,7 +17,7 @@ export default function RightPanel() {
         <TabsList>
           <TabsTrigger value="result">Result</TabsTrigger>
           <TabsTrigger value="schema">Schema</TabsTrigger>
-          <TabsTrigger value="documentation">Documentation</TabsTrigger>
+          <TabsTrigger value="docs">Documentation</TabsTrigger>
         </TabsList>
         <TabsContent value="result" className="h-full w-full">
           <Card className="h-full w-full gap-2">
@@ -28,7 +29,13 @@ export default function RightPanel() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="password">Change your password here.</TabsContent>
+        <TabsContent value="docs" className="h-full w-full">
+          <Card className="h-full w-full gap-2 p-0">
+            <CardContent className="p-2">
+              <BlockEditor />
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );

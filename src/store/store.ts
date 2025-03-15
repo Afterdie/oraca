@@ -1,6 +1,7 @@
 import { configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { QueryExecResult } from "sql.js";
+import { Block } from "@blocknote/core";
 
 const inputSlice = createSlice({
   name: "query",
@@ -29,15 +30,27 @@ const outputSlice = createSlice({
   },
 });
 
+const docsSlice = createSlice({
+  name: "docs",
+  initialState: { value: [] as Block[] },
+  reducers: {
+    updateDocs: (state, action: PayloadAction<Block[]>) => {
+      state.value = action.payload;
+    },
+  },
+});
+
 // Export Actions
 export const { updateQuery } = inputSlice.actions;
 export const { updateResult } = outputSlice.actions;
+export const { updateDocs } = docsSlice.actions;
 
 // Create Store
 export const store = configureStore({
   reducer: {
     queryInput: inputSlice.reducer,
     queryOutput: outputSlice.reducer,
+    docsUpdate: docsSlice.reducer,
   },
 });
 
