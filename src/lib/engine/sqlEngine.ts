@@ -6,8 +6,7 @@ import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
  */
 export async function initDB(): Promise<Database> {
   const SQL: SqlJsStatic = await initSqlJs({
-    locateFile: () =>
-      "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm",
+    locateFile: () => "/sql-wasm.wasm",
   });
   const db = new SQL.Database();
   const initQuery = `CREATE TABLE oraczen (created_on TEXT DEFAULT (datetime('now')));

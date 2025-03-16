@@ -1,9 +1,8 @@
 "use client";
 //theres absolutely no need for using use client here smh
-import Result from "./Result";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BlockEditor from "./BlockEditor";
+import Docs from "./tabs/Docs";
+import Result from "./tabs/Result";
 import TextInput from "./TextInput";
 import { useState } from "react";
 
@@ -29,21 +28,10 @@ export default function RightPanel() {
           <TabsTrigger value="chat">Conversation</TabsTrigger>
         </TabsList>
         <TabsContent value="result" className="h-full w-full">
-          <Card className="h-full w-full gap-2">
-            <CardHeader>
-              <CardTitle>Queried Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Result />
-            </CardContent>
-          </Card>
+          <Result />
         </TabsContent>
         <TabsContent value="docs" className="h-full w-full">
-          <Card className="h-full w-full gap-2 p-0">
-            <CardContent className="p-2">
-              <BlockEditor />
-            </CardContent>
-          </Card>
+          <Docs />
         </TabsContent>
       </Tabs>
     </div>
