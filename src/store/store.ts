@@ -30,6 +30,16 @@ const outputSlice = createSlice({
   },
 });
 
+const schemaSlice = createSlice({
+  name: "schema",
+  initialState: { value: null as QueryExecResult[] | null },
+  reducers: {
+    updateSchema: (state, action: PayloadAction<QueryExecResult[]>) => {
+      state.value = action.payload;
+    },
+  },
+});
+
 const docsSlice = createSlice({
   name: "docs",
   initialState: { value: [] as Block[] },
@@ -43,6 +53,7 @@ const docsSlice = createSlice({
 // Export Actions
 export const { updateQuery } = inputSlice.actions;
 export const { updateResult } = outputSlice.actions;
+export const { updateSchema } = schemaSlice.actions;
 export const { updateDocs } = docsSlice.actions;
 
 // Create Store
@@ -50,6 +61,7 @@ export const store = configureStore({
   reducer: {
     queryInput: inputSlice.reducer,
     queryOutput: outputSlice.reducer,
+    schemaUpdate: schemaSlice.reducer,
     docsUpdate: docsSlice.reducer,
   },
 });

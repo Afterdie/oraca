@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateResult } from "@/store/store";
+import { updateResult, updateSchema } from "@/store/store";
 
 //util
 import { initDB, executeQuery } from "@/lib/engine/sqlEngine";
@@ -49,10 +49,14 @@ export default function page() {
     if (trimmedValue == "" || !db) return;
 
     const result = executeQuery(db, trimmedValue);
-    console.log(result);
+    console.log(result.schema);
     if (result.success) {
-      if (!result.data || !result.duration) return;
+      if (!result.data || !result.duration || !result.schema) return;
       dispatch(updateResult({ value: result.data, duration: result.duration }));
+
+      //not good for performance but ensures that model has full context
+      //can be made into a toggle option so user can opt in
+      dispatch(updateSchema(result.schema));
       return;
     }
     console.log(result.error);
