@@ -1,5 +1,5 @@
 import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
-
+import { setSchema, processSchema } from "./schema";
 /**
  * Initializes the SQL.js database.
  * @returns Promise that resolves to Database
@@ -38,7 +38,8 @@ export function executeQuery(
 
     //fetches all tables their column_names and the datatype
     //ensure realtime context availability
-    const schema = getSchema(db);
+    const schema = generateSchema(db);
+    setSchema(processSchema(schema[0]));
 
     return {
       success: true,
@@ -53,7 +54,7 @@ export function executeQuery(
 
 //incase opted out of auto schema update make this public
 //error check?
-function getSchema(db: Database): QueryExecResult[] {
+function generateSchema(db: Database): QueryExecResult[] {
   return db.exec(
     "SELECT m.name AS table_name, p.name AS column_name, p.type FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p WHERE m.type = 'table';",
   );

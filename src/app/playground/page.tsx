@@ -5,7 +5,8 @@ import { useDispatch } from "react-redux";
 import { updateResult, updateSchema } from "@/store/store";
 
 //util
-import { initDB, executeQuery } from "@/lib/engine/sqlEngine";
+import { initDB, executeQuery } from "@/utils/sqlEngine";
+import { setSchema, processSchema, getSchema } from "@/utils/schema";
 
 //types
 import { Database } from "sql.js";
@@ -49,7 +50,6 @@ export default function page() {
     if (trimmedValue == "" || !db) return;
 
     const result = executeQuery(db, trimmedValue);
-    console.log(result.schema);
     if (result.success) {
       if (!result.data || !result.duration || !result.schema) return;
       dispatch(updateResult({ value: result.data, duration: result.duration }));
@@ -57,11 +57,10 @@ export default function page() {
       //not good for performance but ensures that model has full context
       //can be made into a toggle option so user can opt in
       dispatch(updateSchema(result.schema));
+      setSchema(processSchema(result.schema[0]));
       return;
     }
-    console.log(result.error);
-    //add the error toast here
-    //set the store result here
+    setError(result.error ?? "");
   };
 
   return (

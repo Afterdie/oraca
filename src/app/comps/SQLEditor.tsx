@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Editor from "@monaco-editor/react";
-import { format } from "sql-formatter";
+
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, updateQuery } from "@/store/store";
+import Editor from "@monaco-editor/react";
+import { format } from "sql-formatter";
+
+import { getSchema } from "@/utils/schema";
 
 //shadcn imports
 import { Button } from "@/components/ui/button";
@@ -19,6 +22,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   const dispatch = useDispatch();
 
   const [isTyping, setIsTyping] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null,
   );
@@ -30,14 +34,51 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
       clearTimeout(debounceTimeout);
     }
 
-    const timeout = setTimeout(() => {
-      dispatch(updateQuery(format(newValue)));
+    const timeout = setTimeout(async () => {
+      //get the statements where person wants autofill
+      //this needs some sort of logic to prevent the same on query from getting pushed again and again to the api
       const match = newValue.match(/---(.*?)---/);
-      console.log(match);
+      let updatedValue = newValue;
+      if (match && !loading) {
+        const prompt = match[1];
+        try {
+          setLoading(true);
+          const value = await reqAutocomplete(prompt); // Get cleaned value
+          updatedValue = newValue.replace(match[0], value);
+        } catch (e) {
+          //do nothing limao
+          //since -- acts as a comment doing nothing should not be an issue
+        }
+      }
+      //reducer used here so that the message box has context of the editor
+      dispatch(updateQuery(format(updatedValue)));
+
       setIsTyping(false);
     }, 1000);
 
     setDebounceTimeout(timeout);
+  };
+
+  const reqAutocomplete = async (prompt: string) => {
+    const description = prompt;
+    const dbSchema = getSchema();
+    const response = await fetch("/api/sqlgen", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ description, dbSchema }),
+    });
+
+    const result = await response.json();
+    setLoading(false);
+
+    if (result.query) {
+      const cleanedQuery = result.query.replace(/^```sql\s+|```$/g, "").trim();
+      return cleanedQuery;
+    } else {
+      console.error("Error:", result.error);
+    }
   };
 
   const handleQueryExec = () => {
