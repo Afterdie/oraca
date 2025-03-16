@@ -19,12 +19,23 @@ export default function BlockEditor() {
 
   // Renders the editor instance using a React component.
   return (
-    <BlockNoteView
-      editor={editor}
-      theme={"light"}
-      onChange={() => {
-        dispatch(updateDocs(editor.document));
-      }}
-    />
+    <div>
+      {blocks.length > 0 ? (
+        <BlockNoteView
+          editor={editor}
+          theme={"light"}
+          onChange={() => {
+            dispatch(updateDocs(editor.document));
+          }}
+        />
+      ) : (
+        <GeneratePrompt />
+      )}
+    </div>
   );
 }
+
+//this will hold a icon and a button that allows the user to generate the documentation for their app
+const GeneratePrompt = () => {
+  return <div>bruh</div>;
+};

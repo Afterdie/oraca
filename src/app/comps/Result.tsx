@@ -13,7 +13,14 @@ import {
 export default function Result() {
   const val = useSelector((state: RootState) => state.queryOutput);
   const res = val.value;
-  if (!res || res.length === 0) return <p>No rows selected</p>;
+  if (!res) return <></>;
+  if (res.length === 0)
+    return (
+      <div className="text-muted-foreground mb-2 flex justify-between">
+        <p>No rows selected</p>
+        <p>Executed in {val.duration} milliseconds</p>
+      </div>
+    );
   const rowCount = res[0].values.length;
   const colHeadValue = res[0].columns;
   const rowValues = res[0].values;
