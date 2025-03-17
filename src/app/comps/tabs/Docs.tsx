@@ -11,7 +11,7 @@ import { useCreateBlockNote } from "@blocknote/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { generateDocumentationPrompt } from "@/utils/docs";
+import { generateDocumentationFields } from "@/utils/docs";
 
 export default function BlockEditor() {
   // Creates a new editor instance.
@@ -26,13 +26,13 @@ export default function BlockEditor() {
   const handleGenerate = async () => {
     try {
       setLoading(true);
-      const prompt = generateDocumentationPrompt();
+      const { schema, datatypes, blocks } = generateDocumentationFields();
       const response = await fetch("/api/gendoc", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ schema, datatypes, blocks }),
       });
 
       const result = await response.json();
