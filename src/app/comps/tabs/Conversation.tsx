@@ -20,19 +20,39 @@ const Conversation = () => {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const generate = async (prompt: string) => {
-    dispatch(updateChat({ content: prompt, time: Date.now() }));
+  const handleGenerate = async (prompt: string) => {
+    const submissionTime = Date.now();
+    try {
+      setLoading(true);
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
 
-    //try catch stuff here
-    setLoading(true);
-    setTimeout(() => {
+      const result = await response.json();
+
+      if (result.reply) {
+        dispatch(
+          updateChat([
+            { content: prompt, time: submissionTime },
+            { content: result.reply, time: Date.now() },
+          ]),
+        );
+      }
+    } catch (error) {
+      if (error instanceof Error)
+        console.error("Failed to get reply", error.message);
+      else console.error("Unknown error while generating reply");
+    } finally {
       setLoading(false);
-    }, 4000);
-    //build context window and make api call
+    }
   };
 
   const props: TextInputProps = {
-    generate: generate,
+    generate: handleGenerate,
     loading: loading,
   };
 
@@ -52,7 +72,7 @@ const Conversation = () => {
             return <Chatbubble key={index} {...props} />;
           })}
 
-          {/* invis element for scrolling to */}
+          {/* invis element for scrolling to latest msg*/}
           <div ref={messagesEndRef} />
         </div>
 

@@ -61,8 +61,8 @@ const chatSlice = createSlice({
     ] as MessageTypes[],
   },
   reducers: {
-    updateChat: (state, action: PayloadAction<MessageTypes>) => {
-      state.value = [...state.value, action.payload];
+    updateChat: (state, action: PayloadAction<MessageTypes[]>) => {
+      state.value = [...state.value, ...action.payload];
     },
   },
 });

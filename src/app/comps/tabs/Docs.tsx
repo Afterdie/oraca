@@ -46,9 +46,12 @@ export default function BlockEditor() {
         dispatch(updateDocs(editor.document));
       }
     } catch (error) {
-      console.error("Request failed:", error);
+      if (error instanceof Error)
+        console.error("Failed to generate docs", error.message);
+      else console.error("Unknown error while generating docs");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Renders the editor instance using a React component.

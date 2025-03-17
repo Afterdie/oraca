@@ -7,7 +7,7 @@ export interface TextInputProps {
   generate: (prompt: string) => void;
   loading: boolean;
 }
-export default function TextInput({ generate, loading }: TextInputProps) {
+const TextInput = ({ generate, loading }: TextInputProps) => {
   const [prompt, setPrompt] = useState("");
   const [includeQuery, setIncludeQuery] = useState(false);
 
@@ -47,4 +47,6 @@ export default function TextInput({ generate, loading }: TextInputProps) {
       </div>
     </div>
   );
-}
+};
+
+export default TextInput;
