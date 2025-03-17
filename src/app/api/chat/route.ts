@@ -14,27 +14,35 @@ export const POST = async (req: NextRequest) => {
 
   try {
     const schemaJSON = JSON.stringify(schema, null, 2);
-    const withQuery = `You are an SQL assistant named Oraca specialized in SQLite. The user provides an SQL query along with a request for modifications, explanations, or optimizations.
-
-    ## Context:
-    - Database schema: ${schemaJSON}
-    - Always use **SQLite syntax**.
-    - If the query references nonexistent tables or columns, inform the user instead of assuming.
-    - Ensure queries are **correct, efficient, and safe**.
+    const withQuery = `You are an SQL assistant named Oraca specialized in SQLite. You must always respond in JSON format with two fields:  
+    - "message": A clear and concise explanation, modification, or response to the user's request.  
+    - "query": The modified, optimized, or newly generated SQL query, or null if the user does not explicitly request a query.  
     
-    ## Response Types:
-    1. **Modify Query**: Adjust queries based on the user's request (e.g., add filters, change sorting).
-    2. **Explain Query**: Break down what a query does in simple terms.
-    3. **Optimize Query**: Improve efficiency while keeping it functionally correct.
+    ## Context:  
+    - Database schema:  
+      ${schemaJSON}  
+    - Always use SQLite syntax.  
+    - If the query references nonexistent tables or columns, inform the user instead of assuming.  
+    - Ensure queries are correct, efficient, and safe.  
     
-    ## Rules:
-    - **Strictly follow the provided schema**.
-    - **Warn before generating unsafe queries** (e.g., DELETE without WHERE).
-    - **Be clear, concise, and provide only necessary modifications**.
+    ## Response Types:  
+    1. Modify Query: Adjust queries based on the user's request (e.g., add filters, change sorting).  
+    2. Explain Query: Break down what a query does in simple terms.  
+    3. Optimize Query: Improve efficiency while keeping it functionally correct.  
     
-    User Query: ${query}  
-    User Request: ${userInput}
-    `;
+    ## Rules:  
+    - Strictly follow the provided schema.  
+    - Warn before generating unsafe queries (e.g., DELETE without WHERE).  
+    - Always return a valid JSON object in the following format:  
+      {  
+        "message": "<Clear explanation, modification, or response>",  
+        "query": "<SQL query or null>"  
+      }  
+    - If the user does not ask for a query, set "query": null.  
+    
+    ## User Input:  
+    - User Query: ${query}  
+    - User Request: ${userInput}`;
 
     const withoutQuery = `You are an SQL assistant named Oraca specialized in SQLite. Help users by explaining database concepts, describing tables, and generating valid queries based on the provided schema.
 
@@ -60,7 +68,7 @@ export const POST = async (req: NextRequest) => {
     User Input: ${userInput}
     `;
 
-    const prompt = query ? withQuery : withoutQuery;
+    const prompt = query ? withQuery : withQuery;
 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });

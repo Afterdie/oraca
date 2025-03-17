@@ -60,6 +60,11 @@ const chatSlice = createSlice({
     updateChat: (state, action: PayloadAction<MessageTypes[]>) => {
       state.value = [...state.value, ...action.payload];
     },
+    removeMessage: (state) => {
+      if (state.value.length > 0) {
+        state.value.pop(); // Remove last entry from array
+      }
+    },
   },
 });
 
@@ -68,7 +73,7 @@ export const { updateQuery } = inputSlice.actions;
 export const { updateResult } = outputSlice.actions;
 export const { updateSchema } = schemaSlice.actions;
 export const { updateDocs } = docsSlice.actions;
-export const { updateChat } = chatSlice.actions;
+export const { updateChat, removeMessage } = chatSlice.actions;
 
 // Create Store
 export const store = configureStore({
@@ -78,6 +83,7 @@ export const store = configureStore({
     schemaUpdate: schemaSlice.reducer,
     docsUpdate: docsSlice.reducer,
     chatUpdate: chatSlice.reducer,
+    chatRemove: chatSlice.reducer,
   },
 });
 
