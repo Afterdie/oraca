@@ -22,7 +22,7 @@ import {
 import LeftPanel from "../comps/LeftPanel";
 import RightPanel from "../comps/RightPanel";
 
-export default function Page() {
+const Page = () => {
   const [db, setDB] = useState<Database | null>(null);
   //const [loading, setLoading] = useState(true);
   //const [error, setError] = useState<string | null>(null);
@@ -77,4 +77,6 @@ export default function Page() {
       </ResizablePanelGroup>
     </div>
   );
-}
+};
+
+export default Page;

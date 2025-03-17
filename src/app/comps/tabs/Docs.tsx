@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { generateDocumentationFields } from "@/utils/docs";
 
-export default function BlockEditor() {
+const Docs = () => {
   // Creates a new editor instance.
   const blocks = useSelector((state: RootState) => state.docsUpdate.value);
   const dispatch = useDispatch();
@@ -79,4 +79,6 @@ export default function BlockEditor() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default Docs;

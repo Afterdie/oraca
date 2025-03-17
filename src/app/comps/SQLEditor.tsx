@@ -49,26 +49,34 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
     setDebounceTimeout(timeout);
   };
 
-  //no error block here
   const reqAutocomplete = async (prompt: string) => {
-    const description = prompt;
-    const dbSchema = getSchema();
-    const response = await fetch("/api/gensql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ description, dbSchema }),
-    });
+    try {
+      const description = prompt;
+      const dbSchema = getSchema();
+      const response = await fetch("/api/gensql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ description, dbSchema }),
+      });
 
-    const result = await response.json();
-    setLoading(false);
+      const result = await response.json();
 
-    if (result.query) {
-      const cleanedQuery = result.query.replace(/^```sql\s+|```$/g, "").trim();
-      return cleanedQuery;
-    } else {
-      console.error("Error:", result.error);
+      if (result.query) {
+        const cleanedQuery = result.query
+          .replace(/^```sql\s+|```$/g, "")
+          .trim();
+        return cleanedQuery;
+      } else {
+        console.error("Error:", result.error);
+      }
+    } catch (error) {
+      if (error instanceof Error)
+        console.error("Failed to autocomplete", error.message);
+      else console.error("Unknown error while autocompleting");
+    } finally {
+      setLoading(false);
     }
   };
 

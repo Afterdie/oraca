@@ -12,11 +12,7 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const schema = JSON.stringify(dbSchema, null, 2);
-    //write the whole system prompt here
-    //needs to be tweaked
     const prompt = `You are an AI specialized in converting natural language to strict SQLite queries.
 
     Database Schema:
@@ -35,6 +31,8 @@ export async function POST(req: NextRequest) {
     User Input: ${description}
     Generate SQL Output for this following the given rules and DO NOT PUT FORMATTING ON THE ANSWER.
     `;
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent([prompt]);
 
     if (result && result.response) {
@@ -44,10 +42,8 @@ export async function POST(req: NextRequest) {
       throw new Error("No response received from model.");
     }
   } catch (error) {
-    console.error("Error generating Query:", error);
-    return NextResponse.json(
-      { error: "Failed to generate query" },
-      { status: 500 },
-    );
+    if (error instanceof Error)
+      return NextResponse.json({ error: error }, { status: 500 });
+    else return NextResponse.json({ error: "Unknown error" }, { status: 500 });
   }
 }

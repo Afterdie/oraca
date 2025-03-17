@@ -6,13 +6,17 @@ const API_KEY = process.env.GEMINI_API_KEY;
 export const POST = async (req: NextRequest) => {
   const { schema, datatypes, blocks } = await req.json();
   if (!schema || !datatypes || !blocks || !API_KEY) {
-    return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Details are required" },
+      { status: 400 },
+    );
   }
 
-  const schemaJSON = JSON.stringify(schema, null, 2);
-  const datatypesJSON = JSON.stringify(datatypes, null, 2);
-  const blocksJSON = JSON.stringify(blocks, null, 2);
-  const prompt = `
+  try {
+    const schemaJSON = JSON.stringify(schema, null, 2);
+    const datatypesJSON = JSON.stringify(datatypes, null, 2);
+    const blocksJSON = JSON.stringify(blocks, null, 2);
+    const prompt = `
   You are an AI specialized in generating structured database documentation in strict compliance with the BlockNote block format. Your task is to produce industry-standard documentation explaining all fields of the table and general information, while adhering to the provided schema, supported data types, and explicitly allowed block types. Also include a few sample queries in the code block for each table and write the explanations for these queries in a paragraph block. When you wish to add gap between two topics and two sql queries simply use an empty paragraph block.
 
   Rules & Constraints
@@ -37,7 +41,6 @@ export const POST = async (req: NextRequest) => {
   
   Important: If a required structure cannot be represented using the allowed block types, do not attempt to create new block types—strictly use only what is provided. If a concept cannot be documented using the available blocks, omit it instead of introducing new ones.`;
 
-  try {
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent([prompt]);
