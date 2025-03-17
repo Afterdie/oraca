@@ -59,6 +59,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
     setDebounceTimeout(timeout);
   };
 
+  //no error block here
   const reqAutocomplete = async (prompt: string) => {
     const description = prompt;
     const dbSchema = getSchema();
@@ -82,6 +83,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   };
 
   const handleQueryExec = () => {
+    console.log("something fired");
     exec(value);
   };
 

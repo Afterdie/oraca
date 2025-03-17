@@ -9,8 +9,11 @@ import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 
+import { getSchema } from "@/utils/schema";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { generateDocumentationPrompt } from "@/utils/docPrompt";
 
 export default function BlockEditor() {
   // Creates a new editor instance.
@@ -21,10 +24,33 @@ export default function BlockEditor() {
   });
 
   const [loading, setLoading] = useState(false);
-  const handleGenerate = () => {
-    setLoading(true);
-    //make the api call pass the entire schema in there and then
-    //call dispatch on received block data
+
+  const handleGenerate = async () => {
+    try {
+      setLoading(true);
+      const prompt = generateDocumentationPrompt();
+      const response = await fetch("/api/gendoc", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const result = await response.json();
+
+      if (result.docs) {
+        const cleanedBlocks = result.docs
+          .replace(/^```json\s+|```[\s\n]*$/g, "")
+          .trim();
+        const blocks = JSON.parse(cleanedBlocks).blocks;
+        editor.insertBlocks(blocks, editor.document[0], "before");
+        dispatch(updateDocs(editor.document));
+      }
+    } catch (error) {
+      console.error("Request failed:", error);
+    }
+    setLoading(false);
   };
 
   // Renders the editor instance using a React component.

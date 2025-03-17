@@ -48,8 +48,9 @@ export default function page() {
   const exec = (value: string): void => {
     const trimmedValue = value.trim();
     if (trimmedValue == "" || !db) return;
-
+    console.log(trimmedValue);
     const result = executeQuery(db, trimmedValue);
+    console.log(result);
     if (result.success) {
       if (!result.data || !result.duration || !result.schema) return;
       dispatch(updateResult({ value: result.data, duration: result.duration }));
