@@ -19,10 +19,7 @@ export const POST = async (req: NextRequest) => {
     } else {
       throw new Error("No response received from model.");
     }
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to generate Docs " },
-      { status: 500 },
-    );
+  } catch (e) {
+    return NextResponse.json({ error: e }, { status: 500 });
   }
 };

@@ -6,7 +6,7 @@ import { updateResult, updateSchema } from "@/store/store";
 
 //util
 import { initDB, executeQuery } from "@/utils/sqlEngine";
-import { setSchema, processSchema, getSchema } from "@/utils/schema";
+import { setSchema, processSchema } from "@/utils/schema";
 
 //types
 import { Database } from "sql.js";
@@ -22,10 +22,10 @@ import {
 import LeftPanel from "../comps/LeftPanel";
 import RightPanel from "../comps/RightPanel";
 
-export default function page() {
+export default function Page() {
   const [db, setDB] = useState<Database | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  //const [loading, setLoading] = useState(true);
+  //const [error, setError] = useState<string | null>(null);
 
   const dispatch = useDispatch();
 
@@ -36,10 +36,9 @@ export default function page() {
         setDB(d);
       } catch (e) {
         console.log(e);
-        setError("Failed to initialise Database");
+        //setError("Failed to initialise Database");
       } finally {
         console.log("reached here");
-        setLoading(false);
       }
     }
     setupDB();
@@ -62,7 +61,7 @@ export default function page() {
       setSchema(processSchema(result.schema[0]));
       return;
     }
-    setError(result.error ?? "");
+    //setError(result.error ?? "");
   };
 
   return (

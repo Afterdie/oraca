@@ -21,15 +21,12 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   const value = useSelector((state: RootState) => state.queryInput.value);
   const dispatch = useDispatch();
 
-  const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(false);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null,
   );
 
   const handleChange = (newValue: string) => {
-    setIsTyping(true);
-
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
@@ -41,20 +38,13 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
       let updatedValue = newValue;
       if (match && !loading) {
         const prompt = match[1];
-        try {
-          setLoading(true);
-          const value = await reqAutocomplete(prompt); // Get cleaned value
-          updatedValue = newValue.replace(match[0], value);
-        } catch (e) {
-          //do nothing limao
-          //since -- acts as a comment doing nothing should not be an issue
-        }
+        setLoading(true);
+        const value = await reqAutocomplete(prompt); // Get cleaned value
+        updatedValue = newValue.replace(match[0], value);
       }
       //reducer used here so that the message box has context of the editor
       dispatch(updateQuery(format(updatedValue)));
-
-      setIsTyping(false);
-    }, 1000);
+    }, 2000);
 
     setDebounceTimeout(timeout);
   };

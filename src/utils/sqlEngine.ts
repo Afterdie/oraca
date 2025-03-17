@@ -47,8 +47,9 @@ export function executeQuery(
       duration: (endTime - startTime).toFixed(2),
       schema: schema,
     };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e) {
+    if (e instanceof Error) return { success: false, error: e.message };
+    else return { success: false, error: "Unknown error" };
   }
 }
 
