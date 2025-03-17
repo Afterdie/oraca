@@ -53,7 +53,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   const reqAutocomplete = async (prompt: string) => {
     const description = prompt;
     const dbSchema = getSchema();
-    const response = await fetch("/api/sqlgen", {
+    const response = await fetch("/api/gensql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
