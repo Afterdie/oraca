@@ -9,8 +9,6 @@ import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 
-import { getSchema } from "@/utils/schema";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { generateDocumentationPrompt } from "@/utils/docPrompt";
@@ -55,8 +53,8 @@ export default function BlockEditor() {
 
   // Renders the editor instance using a React component.
   return (
-    <Card className="h-full w-full gap-2 p-0">
-      <CardContent className="h-full w-full p-2">
+    <Card className="h-full w-full overflow-hidden p-0">
+      <CardContent className="h-full w-full overflow-y-auto p-6 px-0 pb-12">
         {blocks.length > 0 ? (
           <BlockNoteView
             editor={editor}

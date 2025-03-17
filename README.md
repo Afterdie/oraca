@@ -6,6 +6,8 @@ schema tables flow
 autocompletions for monaco
 conversation
 
+todo make all components const instead of fn
+
 import order
 core libs
 utility fn

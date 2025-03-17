@@ -100,6 +100,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
           value={value}
           onChange={(newValue) => handleChange(newValue ?? "")}
           options={{
+            wordWrap: "on",
             minimap: { enabled: false },
             lineNumbersMinChars: 2,
             glyphMargin: false,
