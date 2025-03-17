@@ -27,6 +27,7 @@ const Docs = () => {
     try {
       setLoading(true);
       const { schema, datatypes, blocks } = generateDocumentationFields();
+      
       const response = await fetch("/api/gendoc", {
         method: "POST",
         headers: {

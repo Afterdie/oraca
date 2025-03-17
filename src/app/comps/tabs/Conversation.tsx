@@ -8,6 +8,7 @@ import TextInput, { TextInputProps } from "../TextInput";
 import { Card, CardContent } from "@/components/ui/card";
 import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
 import { generateChatPrompt } from "@/utils/chat";
+import { getSchema } from "@/utils/schema";
 
 export interface MessageTypes {
   content: string;
@@ -22,28 +23,23 @@ const Conversation = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleGenerate = async (userInput: string, query: string | null) => {
-    const submissionTime = Date.now();
-    const prompt = generateChatPrompt({ userInput, query }).prompt;
-    //might do something with the query flag like replacing the editor content etc
+    dispatch(updateChat([{ content: userInput, time: Date.now() }]));
     try {
       setLoading(true);
+      const schema = getSchema();
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ schema, userInput, query }),
       });
 
       const result = await response.json();
 
       if (result.reply) {
-        dispatch(
-          updateChat([
-            { content: userInput, time: submissionTime },
-            { content: result.reply, time: Date.now() },
-          ]),
-        );
+        dispatch(updateChat([{ content: result.reply, time: Date.now() }]));
       }
     } catch (error) {
       if (error instanceof Error)
@@ -71,7 +67,7 @@ const Conversation = () => {
             {chats.map((c, index) => {
               const props: ChatbubbleTypes = {
                 content: c.content,
-                sender: index % 2 == 1,
+                sender: index % 2 == 0,
               };
               return <Chatbubble key={index} {...props} />;
             })}

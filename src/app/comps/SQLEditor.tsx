@@ -88,7 +88,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   return (
     <div className="flex h-full flex-col justify-between p-2">
       <div className="flex items-center justify-between">
-        <h1>Query</h1>
+        <h1>Query Editor</h1>
         <Button onClick={handleQueryExec}>Run</Button>
       </div>
       <div>
