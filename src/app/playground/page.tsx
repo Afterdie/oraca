@@ -57,6 +57,7 @@ export default function page() {
 
       //not good for performance but ensures that model has full context
       //can be made into a toggle option so user can opt in
+      //when dispatching for store directlly store the process results
       dispatch(updateSchema(result.schema));
       setSchema(processSchema(result.schema[0]));
       return;

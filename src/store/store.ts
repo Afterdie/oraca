@@ -2,6 +2,7 @@ import { configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { QueryExecResult } from "sql.js";
 import { Block } from "@blocknote/core";
+import { MessageTypes } from "@/app/comps/tabs/Conversation";
 
 const inputSlice = createSlice({
   name: "query",
@@ -50,11 +51,28 @@ const docsSlice = createSlice({
   },
 });
 
+const chatSlice = createSlice({
+  name: "chat",
+  initialState: {
+    value: [
+      { content: "balls", time: 123 },
+      { content: "nni", time: 33 },
+      { content: "balls", time: 123 },
+    ] as MessageTypes[],
+  },
+  reducers: {
+    updateChat: (state, action: PayloadAction<MessageTypes>) => {
+      state.value = [...state.value, action.payload];
+    },
+  },
+});
+
 // Export Actions
 export const { updateQuery } = inputSlice.actions;
 export const { updateResult } = outputSlice.actions;
 export const { updateSchema } = schemaSlice.actions;
 export const { updateDocs } = docsSlice.actions;
+export const { updateChat } = chatSlice.actions;
 
 // Create Store
 export const store = configureStore({
@@ -63,6 +81,7 @@ export const store = configureStore({
     queryOutput: outputSlice.reducer,
     schemaUpdate: schemaSlice.reducer,
     docsUpdate: docsSlice.reducer,
+    chatUpdate: chatSlice.reducer,
   },
 });
 
