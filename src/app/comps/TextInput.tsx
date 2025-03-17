@@ -1,5 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, updateUserInput } from "@/store/store";
+
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
@@ -8,7 +11,11 @@ export interface TextInputProps {
   loading: boolean;
 }
 const TextInput = ({ generate, loading }: TextInputProps) => {
-  const [userInput, setUserInput] = useState("");
+  const userInput = useSelector(
+    (state: RootState) => state.userInputUpdate.userInput,
+  );
+  const dispatch = useDispatch();
+
   const [includeQuery, setIncludeQuery] = useState(false);
   let query: string | null = null;
 
@@ -16,7 +23,7 @@ const TextInput = ({ generate, loading }: TextInputProps) => {
     if (userInput.trim() && !loading) {
       if (includeQuery) query = ""; //get from somewher
       generate(userInput, query);
-      setUserInput("");
+      dispatch(updateUserInput(""));
     }
   };
 
@@ -27,7 +34,7 @@ const TextInput = ({ generate, loading }: TextInputProps) => {
           className="w-full resize-none border-none pl-2 focus-visible:ring-0"
           placeholder="Talk to your database"
           value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
+          onChange={(e) => dispatch(updateUserInput(e.target.value))}
         />
         <div className="flex flex-row justify-between">
           <Button

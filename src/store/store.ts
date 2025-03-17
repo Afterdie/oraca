@@ -55,6 +55,7 @@ const chatSlice = createSlice({
   name: "chat",
   initialState: {
     value: [] as MessageTypes[],
+    userInput: "" as string,
   },
   reducers: {
     updateChat: (state, action: PayloadAction<MessageTypes[]>) => {
@@ -65,6 +66,9 @@ const chatSlice = createSlice({
         state.value.pop(); // Remove last entry from array
       }
     },
+    updateUserInput: (state, action: PayloadAction<string>) => {
+      state.userInput = action.payload;
+    },
   },
 });
 
@@ -73,7 +77,7 @@ export const { updateQuery } = inputSlice.actions;
 export const { updateResult } = outputSlice.actions;
 export const { updateSchema } = schemaSlice.actions;
 export const { updateDocs } = docsSlice.actions;
-export const { updateChat, removeMessage } = chatSlice.actions;
+export const { updateChat, removeMessage, updateUserInput } = chatSlice.actions;
 
 // Create Store
 export const store = configureStore({
@@ -84,6 +88,7 @@ export const store = configureStore({
     docsUpdate: docsSlice.reducer,
     chatUpdate: chatSlice.reducer,
     chatRemove: chatSlice.reducer,
+    userInputUpdate: chatSlice.reducer,
   },
 });
 
