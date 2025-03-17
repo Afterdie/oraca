@@ -8,6 +8,7 @@ export const POST = async (req: NextRequest) => {
   if (!prompt || !API_KEY) {
     return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
   }
+
   try {
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -15,11 +16,13 @@ export const POST = async (req: NextRequest) => {
 
     if (result && result.response) {
       const generatedText = await result.response.text();
-      return NextResponse.json({ docs: generatedText });
+      return NextResponse.json({ reply: generatedText });
     } else {
       throw new Error("No response received from model.");
     }
-  } catch (e) {
-    return NextResponse.json({ error: e }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error)
+      return NextResponse.json({ error: error }, { status: 500 });
+    else return NextResponse.json({ error: "Unknown error" }, { status: 500 });
   }
 };

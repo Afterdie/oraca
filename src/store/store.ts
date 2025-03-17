@@ -54,11 +54,7 @@ const docsSlice = createSlice({
 const chatSlice = createSlice({
   name: "chat",
   initialState: {
-    value: [
-      { content: "balls", time: 123 },
-      { content: "nni", time: 33 },
-      { content: "balls", time: 123 },
-    ] as MessageTypes[],
+    value: [] as MessageTypes[],
   },
   reducers: {
     updateChat: (state, action: PayloadAction<MessageTypes[]>) => {

@@ -11,7 +11,7 @@ import { useCreateBlockNote } from "@blocknote/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { generateDocumentationPrompt } from "@/utils/docPrompt";
+import { generateDocumentationPrompt } from "@/utils/docs";
 
 export default function BlockEditor() {
   // Creates a new editor instance.

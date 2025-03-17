@@ -7,6 +7,7 @@ import { updateChat, RootState } from "@/store/store";
 import TextInput, { TextInputProps } from "../TextInput";
 import { Card, CardContent } from "@/components/ui/card";
 import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
+import { generateChatPrompt } from "@/utils/chat";
 
 export interface MessageTypes {
   content: string;
@@ -20,8 +21,10 @@ const Conversation = () => {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const handleGenerate = async (prompt: string) => {
+  const handleGenerate = async (userInput: string, query: string | null) => {
     const submissionTime = Date.now();
+    const prompt = generateChatPrompt({ userInput, query }).prompt;
+    //might do something with the query flag like replacing the editor content etc
     try {
       setLoading(true);
       const response = await fetch("/api/chat", {
@@ -37,7 +40,7 @@ const Conversation = () => {
       if (result.reply) {
         dispatch(
           updateChat([
-            { content: prompt, time: submissionTime },
+            { content: userInput, time: submissionTime },
             { content: result.reply, time: Date.now() },
           ]),
         );
@@ -63,18 +66,25 @@ const Conversation = () => {
   return (
     <Card className="h-full w-full pb-4">
       <CardContent className="flex h-full w-full flex-col justify-between overflow-hidden">
-        <div className="flex flex-3 flex-col gap-2 overflow-y-auto">
-          {chats.map((c, index) => {
-            const props: ChatbubbleTypes = {
-              content: c.content,
-              sender: index % 2 == 0,
-            };
-            return <Chatbubble key={index} {...props} />;
-          })}
+        {chats.length > 0 ? (
+          <div className="flex flex-3 flex-col gap-4 overflow-y-auto">
+            {chats.map((c, index) => {
+              const props: ChatbubbleTypes = {
+                content: c.content,
+                sender: index % 2 == 1,
+              };
+              return <Chatbubble key={index} {...props} />;
+            })}
 
-          {/* invis element for scrolling to latest msg*/}
-          <div ref={messagesEndRef} />
-        </div>
+            {/* invis element for scrolling to latest msg*/}
+            <div ref={messagesEndRef} />
+          </div>
+        ) : (
+          <div className="flex flex-3 flex-col items-center justify-center">
+            <div>image here</div>
+            <div>Start Chatting !</div>
+          </div>
+        )}
 
         <div className="relative flex-1">
           <TextInput {...props} />

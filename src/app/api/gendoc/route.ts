@@ -19,7 +19,9 @@ export const POST = async (req: NextRequest) => {
     } else {
       throw new Error("No response received from model.");
     }
-  } catch (e) {
-    return NextResponse.json({ error: e }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error)
+      return NextResponse.json({ error: error }, { status: 500 });
+    else return NextResponse.json({ error: "Unknown error" }, { status: 500 });
   }
 };

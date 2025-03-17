@@ -4,17 +4,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
 export interface TextInputProps {
-  generate: (prompt: string) => void;
+  generate: (userInput: string, query: string | null) => void;
   loading: boolean;
 }
 const TextInput = ({ generate, loading }: TextInputProps) => {
-  const [prompt, setPrompt] = useState("");
+  const [userInput, setUserInput] = useState("");
   const [includeQuery, setIncludeQuery] = useState(false);
+  let query: string | null = null;
 
   const handleButtonClick = () => {
-    if (prompt.trim() && !loading) {
-      generate(prompt);
-      setPrompt("");
+    if (userInput.trim() && !loading) {
+      if (includeQuery) query = ""; //get from somewher
+      generate(userInput, query);
+      setUserInput("");
     }
   };
 
@@ -24,8 +26,8 @@ const TextInput = ({ generate, loading }: TextInputProps) => {
         <Textarea
           className="w-full resize-none border-none pl-2 focus-visible:ring-0"
           placeholder="Talk to your database"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
         />
         <div className="flex flex-row justify-between">
           <Button
