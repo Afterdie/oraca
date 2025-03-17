@@ -3,7 +3,7 @@ import Docs from "./tabs/Docs";
 import Result from "./tabs/Result";
 import Conversation from "./tabs/Conversation";
 
-export default function RightPanel() {
+const RightPanel = () => {
   return (
     //conditionally set this relative style
     <div className="h-full pl-2">
@@ -32,4 +32,6 @@ export default function RightPanel() {
       </Tabs>
     </div>
   );
-}
+};
+
+export default RightPanel;

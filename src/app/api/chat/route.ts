@@ -14,7 +14,7 @@ export const POST = async (req: NextRequest) => {
 
   try {
     const schemaJSON = JSON.stringify(schema, null, 2);
-    const withQuery = `You are an SQL assistant specialized in SQLite. The user provides an SQL query along with a request for modifications, explanations, or optimizations.
+    const withQuery = `You are an SQL assistant named Oraca specialized in SQLite. The user provides an SQL query along with a request for modifications, explanations, or optimizations.
 
     ## Context:
     - Database schema: ${schemaJSON}
@@ -36,7 +36,7 @@ export const POST = async (req: NextRequest) => {
     User Request: ${userInput}
     `;
 
-    const withoutQuery = `You are an SQL assistant specialized in SQLite. Help users by explaining database concepts, describing tables, and generating valid queries based on the provided schema.
+    const withoutQuery = `You are an SQL assistant named Oraca specialized in SQLite. Help users by explaining database concepts, describing tables, and generating valid queries based on the provided schema.
 
     ## Context:
     - Database schema: ${schemaJSON}

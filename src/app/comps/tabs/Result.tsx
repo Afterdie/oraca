@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function Result() {
+const Result = () => {
   const val = useSelector((state: RootState) => state.queryOutput);
   const res = val.value;
   if (!res) return <></>;
@@ -69,4 +69,6 @@ export default function Result() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default Result;
