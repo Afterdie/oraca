@@ -1,9 +1,9 @@
 import { configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
-import { QueryExecResult } from "sql.js";
 import { Block } from "@blocknote/core";
 import { MessageTypes } from "@/app/comps/tabs/Conversation";
 import { DatabaseSchema } from "@/utils/schema";
+import { RowData } from "@/utils/sqlEngine";
 
 const inputSlice = createSlice({
   name: "query",
@@ -18,13 +18,13 @@ const inputSlice = createSlice({
 const outputSlice = createSlice({
   name: "query",
   initialState: {
-    value: null as QueryExecResult[] | null,
+    value: null as RowData[] | null,
     duration: null as string | null,
   },
   reducers: {
     updateResult: (
       state,
-      action: PayloadAction<{ value: QueryExecResult[]; duration: string }>,
+      action: PayloadAction<{ value: RowData[]; duration: string }>,
     ) => {
       state.value = action.payload.value;
       state.duration = action.payload.duration;

@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { updateResult, updateSchema } from "@/store/store";
+import { updateResult } from "@/store/store";
 
 //util
 import { initDB, executeQuery } from "@/utils/sqlEngine";
-import { setSchema, processSchema } from "@/utils/schema";
 
 //types
 import { Database } from "sql.js";
@@ -26,14 +25,13 @@ import RightPanel from "../comps/RightPanel";
 const Page = () => {
   const router = useRouter();
   const [db, setDB] = useState<Database | null>(null);
-  //const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(false);
   //const [error, setError] = useState<string | null>(null);
 
   const dispatch = useDispatch();
 
   //conditionally setup db is the config says local
   useEffect(() => {
-
     //incase the connection string does not exist send user back to connect page
     const storedConfig = sessionStorage.getItem("config");
     if (!storedConfig) {
@@ -54,48 +52,49 @@ const Page = () => {
       }
       setupDB();
     }
-  }, []);
+  }, [router]);
 
+  interface config {
+    provider: string;
+    connection_string: string | null;
+  }
   //if i add connectors then only this needs to be modified
-  const exec = (value: string): void => {
-    const trimmedValue = value.trim();
-
-    //two possible cases local execution and connected db
+  const handleExecuteQuery = async (value: string): Promise<void> => {
+    if (!value.trim()) return;
+    //prevent default
     const storedConfig = sessionStorage.getItem("config");
     if (!storedConfig) {
-      //handle with a toast
+      router.push("/connect");
       return;
     }
-    const config = JSON.parse(storedConfig);
+    //checks which request local or connection
+    const config: config = JSON.parse(storedConfig);
 
-    if (config.provider == "local") {
-      if (trimmedValue == "" || !db) return;
-
-      //generates the result for local db
-      const result = executeQuery(db, trimmedValue);
-
-      if (result.success) {
-        if (!result.data || !result.duration || !result.schema) return;
-        const processedSchema = processSchema(result.schema[0]);
-        dispatch(
-          updateResult({ value: result.data, duration: result.duration }),
-        );
-        //when dispatching for store directlly store the process results
-        dispatch(updateSchema(processedSchema));
-        setSchema(processedSchema);
-        return;
-      }
+    let result;
+    if (config.provider === "local") {
+      if (!db) return; //cna show a modal here
+      result = await executeQuery(value, db, null);
     } else {
-      //do something
+      if (!config.connection_string) return;
+      result = await executeQuery(value, null, config.connection_string);
     }
-    //setError(result.error ?? "");
+    //const processedSchema = processSchema(result.schema[0]);
+    if (result.success) {
+      if (!result.data || !result.duration) return;
+      const data = result.data;
+      dispatch(updateResult({ value: data, duration: result.duration }));
+      console.log(data, value);
+    } else {
+      //show a toast about failuer
+      console.error(result.error);
+    }
   };
 
   return (
     <div className="relative h-screen w-screen p-2">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={35} className="rounded-lg border">
-          <LeftPanel exec={exec} />
+          <LeftPanel exec={handleExecuteQuery} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={65}>

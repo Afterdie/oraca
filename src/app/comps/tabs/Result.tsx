@@ -15,17 +15,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const Result = () => {
   const val = useSelector((state: RootState) => state.queryOutput);
   const res = val.value;
-  if (!res) return <></>;
-  if (res.length === 0)
+  if (!res || res.length === 0)
     return (
       <div className="text-muted-foreground mb-2 flex justify-between">
         <p>No rows selected</p>
         <p>Executed in {val.duration} milliseconds</p>
       </div>
     );
-  const rowCount = res[0].values.length;
-  const colHeadValue = res[0].columns;
-  const rowValues = res[0].values;
+  const rowCount = res.length;
+  const columnNames = Object.keys(res[0]);
   const duration = val.duration;
 
   return (
@@ -43,21 +41,25 @@ const Result = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {colHeadValue.map((c, index) => {
+                  {columnNames.map((colName, index) => {
                     return (
                       <TableHead key={index} className="bg-muted">
-                        {c}
+                        {colName}
                       </TableHead>
                     );
                   })}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rowValues.map((r, index) => {
+                {res.map((row, index) => {
                   return (
                     <TableRow key={index}>
-                      {r.map((c, cindex) => {
-                        return <TableCell key={cindex}>{c}</TableCell>;
+                      {columnNames.map((colName, colIndex) => {
+                        return (
+                          <TableCell key={colIndex}>
+                            {displayableValue(row[colName])}
+                          </TableCell>
+                        );
                       })}
                     </TableRow>
                   );
@@ -71,4 +73,28 @@ const Result = () => {
   );
 };
 
+const displayableValue = (
+  c:
+    | string
+    | number
+    | boolean
+    | null
+    | Date
+    | Array<string | number | boolean | null | Date | Record<string, unknown>>
+    | Record<string, unknown>,
+) => {
+  let displayValue: string;
+
+  if (c instanceof Date) {
+    displayValue = c.toISOString();
+  } else if (c === null) {
+    displayValue = "N/A";
+  } else if (Array.isArray(c) || typeof c === "object") {
+    displayValue = JSON.stringify(c);
+  } else {
+    displayValue = String(c);
+  }
+
+  return displayValue;
+};
 export default Result;

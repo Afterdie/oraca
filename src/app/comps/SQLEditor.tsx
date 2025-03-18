@@ -30,7 +30,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
-
+    dispatch(updateQuery(newValue));
     const timeout = setTimeout(async () => {
       //get the statements where person wants autofill
       //this needs some sort of logic to prevent the same on query from getting pushed again and again to the api
@@ -90,7 +90,9 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
       <div className="flex items-center justify-between">
         {/* add  some type of label showing what db currentonl on*/}
         <h1>Query Editor</h1>
-        <Button onClick={handleQueryExec}>Run</Button>
+        <Button onClick={handleQueryExec} disabled={loading}>
+          Run
+        </Button>
       </div>
       <div>
         <Editor
