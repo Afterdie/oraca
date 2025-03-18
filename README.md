@@ -6,7 +6,9 @@ schema tables flow
 autocompletions for monaco
 conversation
 
-todo make all components const instead of fn
+another day another major rewrite 👍
+- add connectors and offload execution to servers
+- also move schema generation
 
 import order
 core libs
