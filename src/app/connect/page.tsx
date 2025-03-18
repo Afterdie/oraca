@@ -31,7 +31,16 @@ const Page = () => {
   };
 
   const handleConnect = async () => {
-    if (config.connection_string === "") return;
+    if (config.provider != "local" && config.connection_string === "") return;
+
+    //add an option for user to upload their own .sqlite file
+    if (config.provider === "local") {
+      sessionStorage.setItem(
+        "config",
+        JSON.stringify({ ...config, connection_string: null }),
+      );
+      router.push("/playground");
+    }
 
     try {
       setConnecting(true);
@@ -68,23 +77,32 @@ const Page = () => {
           onValueChange={handleProviderChange}
         >
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="pg" id="option-one" />
-            <Label htmlFor="option-one">Postgres</Label>
+            <RadioGroupItem value="pg" id="pg" />
+            <Label htmlFor="pg">Postgres</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="mysql" id="option-two" />
-            <Label htmlFor="option-two">MySQL</Label>
+            <RadioGroupItem value="mysql" id="mysql" />
+            <Label htmlFor="mysql">MySQL</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="local" id="local" />
+            <Label htmlFor="local">local</Label>
           </div>
         </RadioGroup>
       </div>
-      <div className="grid">
-        <Label htmlFor="connectionString">Connection URL</Label>
-        <Input
-          id="connectionString"
-          onChange={handleConnectionChange}
-          value={config.connection_string}
-        />
-      </div>
+      {/* need to make some sort of form that dynamically asks on info based on selected radio gropu */}
+      {config.provider === "local" ? (
+        <></>
+      ) : (
+        <div className="grid">
+          <Label htmlFor="connectionString">Connection URL</Label>
+          <Input
+            id="connectionString"
+            onChange={handleConnectionChange}
+            value={config.connection_string}
+          />
+        </div>
+      )}
       <div>
         <Button onClick={handleConnect} disabled={connecting}>
           Connect
