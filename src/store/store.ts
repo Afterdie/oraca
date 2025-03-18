@@ -43,10 +43,13 @@ const schemaSlice = createSlice({
 
 const docsSlice = createSlice({
   name: "docs",
-  initialState: { value: [] as Block[] },
+  initialState: { value: [] as Block[], loading: false },
   reducers: {
     updateDocs: (state, action: PayloadAction<Block[]>) => {
       state.value = action.payload;
+    },
+    loadDocs: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     },
   },
 });
@@ -76,7 +79,7 @@ const chatSlice = createSlice({
 export const { updateQuery } = inputSlice.actions;
 export const { updateResult } = outputSlice.actions;
 export const { updateSchema } = schemaSlice.actions;
-export const { updateDocs } = docsSlice.actions;
+export const { updateDocs, loadDocs } = docsSlice.actions;
 export const { updateChat, removeMessage, updateUserInput } = chatSlice.actions;
 
 // Create Store
@@ -86,6 +89,7 @@ export const store = configureStore({
     queryOutput: outputSlice.reducer,
     schemaUpdate: schemaSlice.reducer,
     docsUpdate: docsSlice.reducer,
+    docsLoad: docsSlice.reducer,
     chatUpdate: chatSlice.reducer,
     chatRemove: chatSlice.reducer,
     userInputUpdate: chatSlice.reducer,

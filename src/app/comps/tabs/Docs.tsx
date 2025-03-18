@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateDocs, RootState } from "@/store/store";
+import { updateDocs, loadDocs, RootState } from "@/store/store";
 
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -15,19 +14,22 @@ import { generateDocumentationFields } from "@/utils/docs";
 
 const Docs = () => {
   // Creates a new editor instance.
-  const blocks = useSelector((state: RootState) => state.docsUpdate.value);
+  const docs = useSelector((state: RootState) => state.docsUpdate);
+  const blocks = docs.value;
+  const loading = docs.loading;
   const dispatch = useDispatch();
   const editor = useCreateBlockNote({
     initialContent: blocks.length > 0 ? blocks : undefined,
   });
 
-  const [loading, setLoading] = useState(false);
+  console.log(editor);
 
   const handleGenerate = async () => {
     try {
-      setLoading(true);
+      dispatch(loadDocs(true));
+
       const { schema, datatypes, blocks } = generateDocumentationFields();
-      
+
       const response = await fetch("/api/gendoc", {
         method: "POST",
         headers: {
@@ -44,14 +46,16 @@ const Docs = () => {
           .trim();
         const blocks = JSON.parse(cleanedBlocks).blocks;
         editor.insertBlocks(blocks, editor.document[0], "before");
-        dispatch(updateDocs(editor.document));
+
+        const newBlocks = editor.document;
+        dispatch(updateDocs(newBlocks));
       }
     } catch (error) {
       if (error instanceof Error)
         console.error("Failed to generate docs", error.message);
       else console.error("Unknown error while generating docs");
     } finally {
-      setLoading(false);
+      dispatch(loadDocs(false));
     }
   };
 
