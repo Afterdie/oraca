@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { QueryExecResult } from "sql.js";
 import { Block } from "@blocknote/core";
 import { MessageTypes } from "@/app/comps/tabs/Conversation";
+import { DatabaseSchema } from "@/utils/schema";
 
 const inputSlice = createSlice({
   name: "query",
@@ -33,9 +34,9 @@ const outputSlice = createSlice({
 
 const schemaSlice = createSlice({
   name: "schema",
-  initialState: { value: null as QueryExecResult[] | null },
+  initialState: { value: null as DatabaseSchema | null },
   reducers: {
-    updateSchema: (state, action: PayloadAction<QueryExecResult[]>) => {
+    updateSchema: (state, action: PayloadAction<DatabaseSchema>) => {
       state.value = action.payload;
     },
   },

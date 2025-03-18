@@ -22,8 +22,6 @@ const Docs = () => {
     initialContent: blocks.length > 0 ? blocks : undefined,
   });
 
-  console.log(editor);
-
   const handleGenerate = async () => {
     try {
       dispatch(loadDocs(true));

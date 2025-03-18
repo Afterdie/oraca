@@ -44,6 +44,7 @@ const Page = () => {
     setupDB();
   }, []);
 
+  //if i add connectors then only this needs to be modified
   const exec = (value: string): void => {
     const trimmedValue = value.trim();
     if (trimmedValue == "" || !db) return;
@@ -52,13 +53,11 @@ const Page = () => {
     console.log(result);
     if (result.success) {
       if (!result.data || !result.duration || !result.schema) return;
+      const processedSchema = processSchema(result.schema[0]);
       dispatch(updateResult({ value: result.data, duration: result.duration }));
-
-      //not good for performance but ensures that model has full context
-      //can be made into a toggle option so user can opt in
       //when dispatching for store directlly store the process results
-      dispatch(updateSchema(result.schema));
-      setSchema(processSchema(result.schema[0]));
+      dispatch(updateSchema(processedSchema));
+      setSchema(processedSchema);
       return;
     }
     //setError(result.error ?? "");
