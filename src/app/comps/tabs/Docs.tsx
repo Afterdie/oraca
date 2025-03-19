@@ -10,7 +10,8 @@ import { useCreateBlockNote } from "@blocknote/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { generateDocumentationFields } from "@/utils/docs";
+
+import { getSchema } from "@/utils/schema";
 
 const Docs = () => {
   // Creates a new editor instance.
@@ -26,28 +27,34 @@ const Docs = () => {
     try {
       dispatch(loadDocs(true));
 
-      const { schema, datatypes, blocks } = generateDocumentationFields();
+      const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+      const config = sessionStorage.getItem("config");
+      if (!config) return;
 
-      const response = await fetch("/api/gendoc", {
+      const parsedConfig = JSON.parse(config);
+
+      let db_schema = null;
+      const connection_string = parsedConfig.connection_string;
+      //if the db is local then get schema
+      if (!connection_string) db_schema = getSchema();
+      console.log(db_schema);
+      const response = await fetch(`${backendURL}gen/docs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ schema, datatypes, blocks }),
+        body: JSON.stringify({ connection_string, db_schema }),
       });
 
       const result = await response.json();
-
-      if (result.docs) {
-        const cleanedBlocks = result.docs
-          .replace(/^```json\s+|```[\s\n]*$/g, "")
-          .trim();
-        const blocks = JSON.parse(cleanedBlocks).blocks;
+      if (result.success) {
+        const blocks = result.blocks;
         editor.insertBlocks(blocks, editor.document[0], "before");
 
         const newBlocks = editor.document;
         dispatch(updateDocs(newBlocks));
-      }
+      } else console.error("Failed to generate docs", result.message);
+      //dk about the lines above
     } catch (error) {
       if (error instanceof Error)
         console.error("Failed to generate docs", error.message);

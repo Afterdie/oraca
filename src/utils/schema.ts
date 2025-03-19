@@ -1,36 +1,55 @@
 import { QueryExecResult } from "sql.js";
 
-export type TableSchema = {
-  [key: string]: {
-    [column: string]: string;
-  };
+interface ColumnSchema {
+  name: string;
+  type: string;
+  nullable: boolean;
+}
+
+interface ForeignKeySchema {
+  column: string[];
+  references_table: string;
+  referenced_column: string[];
+}
+
+interface RelationshipSchema {
+  from_table: string;
+  from_columns: string[];
+  to_table: string;
+  to_columns: string[];
+}
+
+export interface TableSchema {
+  columns: ColumnSchema[];
+  foreign_keys: ForeignKeySchema[];
+  relationships: RelationshipSchema[];
+}
+
+let schema: Record<string, TableSchema> = {
+  oraczen: {
+    columns: [
+      {
+        name: "created_on",
+        type: "TEXT",
+        nullable: false,
+      },
+    ],
+    foreign_keys: [],
+    relationships: [],
+  },
 };
 
-export type Relationship = {
-  table: string;
-  field: string;
-  references: string;
-  relation: "one-to-one" | "one-to-many" | "many-to-many";
-};
+export const getSchema = (): Record<string, TableSchema> => schema;
 
-export type DatabaseSchema = {
-  tables: TableSchema;
-  relationships: Relationship[];
-};
-
-let schema: DatabaseSchema = {
-  tables: {},
-  relationships: [],
-};
-
-export const getSchema = (): DatabaseSchema => schema;
-
-export const setSchema = (newSchema: DatabaseSchema): void => {
+export const setSchema = (newSchema: Record<string, TableSchema>): void => {
   schema = newSchema;
 };
 
-export const processSchema = (data: QueryExecResult): DatabaseSchema => {
-  const transformedSchema: DatabaseSchema = { tables: {}, relationships: [] };
+//this takes in the raw input and translates to db friendly structure
+export const processSchema = (
+  data: QueryExecResult,
+): Record<string, TableSchema> => {
+  const transformedSchema: Record<string, TableSchema> = {};
 
   data.values.forEach((row) => {
     const tableName = String(row[0] ?? "");
@@ -41,11 +60,19 @@ export const processSchema = (data: QueryExecResult): DatabaseSchema => {
       throw new Error("Invalid table name encountered");
     }
 
-    if (!transformedSchema.tables[tableName]) {
-      transformedSchema.tables[tableName] = {};
+    if (!transformedSchema[tableName]) {
+      transformedSchema[tableName] = {
+        columns: [],
+        foreign_keys: [],
+        relationships: [],
+      };
     }
 
-    transformedSchema.tables[tableName][columnName] = columnType;
+    transformedSchema[tableName].columns.push({
+      name: columnName,
+      type: columnType,
+      nullable: false, // Assuming nullable information is not available currently not being tracked
+    });
   });
 
   return transformedSchema;

@@ -1,5 +1,7 @@
 import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
-//import { setSchema, processSchema } from "./schema";
+import { processSchema, setSchema } from "./schema";
+import { TableSchema } from "./schema";
+
 /**
  * Initializes the SQL.js database for local querying.
  * @returns Promise that resolves to Database
@@ -13,31 +15,6 @@ export async function initDB(): Promise<Database> {
   INSERT INTO oraczen DEFAULT VALUES;`;
   db.run(initQuery);
   return db;
-}
-
-interface ColumnSchema {
-  name: string;
-  type: string;
-  nullable: boolean;
-}
-
-interface ForeignKeySchema {
-  column: string[];
-  references_table: string;
-  referenced_column: string[];
-}
-
-interface RelationshipSchema {
-  from_table: string;
-  from_columns: string[];
-  to_table: string;
-  to_columns: string[];
-}
-
-interface TableSchema {
-  columns: ColumnSchema[];
-  foreign_keys: ForeignKeySchema[];
-  relationships: RelationshipSchema[];
 }
 
 //servers response when a schema is requested
@@ -96,8 +73,9 @@ export async function executeQuery(
       if (res.length > 0)
         result = res.length > 0 ? transformSQLResult(db.exec(query)[0]) : [];
       endTime = performance.now();
-
-      //remove this for now setSchema(processSchema(schema[0]));
+      const schema = generateSchema(db);
+      //console.log(processSchema(schema[0]));
+      setSchema(processSchema(schema[0]));
     } else {
       const response = await fetch(`${backendURL}execute_query`, {
         method: "POST",
@@ -127,17 +105,16 @@ export async function executeQuery(
   }
 }
 
-//incase opted out of auto schema update make this public
-//error check? tihs is for local db
-// const generateSchema = (db: Database): QueryExecResult[] => {
-//   return db.exec(
-//     "SELECT m.name AS table_name, p.name AS column_name, p.type FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p WHERE m.type = 'table';",
-//   );
-// };
+// incase opted out of auto schema update make this public
+// error check? tihs is for local db
+const generateSchema = (db: Database): QueryExecResult[] => {
+  return db.exec(
+    "SELECT m.name AS table_name, p.name AS column_name, p.type FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p WHERE m.type = 'table';",
+  );
+};
 
+//transform the result to match the backend format
 const transformSQLResult = (result: QueryExecResult): RowData[] => {
-  console.log(result);
-
   const { columns, values } = result;
 
   return values.map((row) => {
