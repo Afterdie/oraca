@@ -27,10 +27,17 @@ interface ForeignKeySchema {
   referenced_column: string[];
 }
 
+interface RelationshipSchema {
+  from_table: string;
+  from_columns: string[];
+  to_table: string;
+  to_columns: string[];
+}
+
 interface TableSchema {
   columns: ColumnSchema[];
   foreign_keys: ForeignKeySchema[];
-  relationships: string[];
+  relationships: RelationshipSchema[];
 }
 
 //servers response when a schema is requested
@@ -40,6 +47,7 @@ export interface SchemaResponseTypes {
   message?: string;
 }
 
+//this has to be any or else the transform function breaks
 export interface RowData {
   [key: string]:
     | string
@@ -47,8 +55,8 @@ export interface RowData {
     | boolean
     | null
     | Date
-    | Array<string | number | boolean | null | Date | Record<string, unknown>>
-    | Record<string, unknown>;
+    | Array<any>
+    | Record<string, any>;
 }
 //servers response when a query is executed
 interface QueryExecResponseTypes {
