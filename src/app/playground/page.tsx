@@ -94,11 +94,11 @@ const Page = () => {
     <div className="relative h-screen w-screen">
       <div className="absolute h-full w-full p-2">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={35} className="mr-2 rounded-lg border">
+          <ResizablePanel defaultSize={35} className="mr-[3px] rounded-lg">
             <LeftPanel exec={handleExecuteQuery} />
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={65} className="ml-2">
+          <ResizablePanel defaultSize={65} className="ml-[3px]">
             <RightPanel />
           </ResizablePanel>
         </ResizablePanelGroup>
