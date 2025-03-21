@@ -85,12 +85,12 @@ export async function executeQuery(
       if (!res.success)
         return { success: false, error: "Failed to perform query" };
       result = res.data || [];
-      duration = res.duration;
+      duration = res.duration * 1000;
     }
     return {
       success: true,
       data: result,
-      duration: (duration * 1000).toFixed(2),
+      duration: duration.toFixed(2),
     };
   } catch (error) {
     if (error instanceof Error) return { success: false, error: error.message };
