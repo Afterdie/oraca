@@ -33,22 +33,22 @@ const Docs = () => {
 
       const parsedConfig = JSON.parse(config);
 
-      let db_schema = null;
+      let schema = null;
       const connection_string = parsedConfig.connection_string;
       //if the db is local then get schema
-      if (!connection_string) db_schema = getMetadata().schema;
-      console.log(db_schema);
+      if (!connection_string) schema = getMetadata().schema;
+      console.log({ connection_string, schema });
       const response = await fetch(`${backendURL}gen/docs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ connection_string, db_schema }),
+        body: JSON.stringify({ connection_string, schema }),
       });
 
       const result = await response.json();
       if (result.success) {
-        const blocks = result.blocks;
+        const blocks = result.data;
         editor.insertBlocks(blocks, editor.document[0], "before");
 
         const newBlocks = editor.document;
