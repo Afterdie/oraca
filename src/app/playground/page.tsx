@@ -91,16 +91,26 @@ const Page = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen p-2">
-      <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={35} className="rounded-lg border">
-          <LeftPanel exec={handleExecuteQuery} />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={65}>
-          <RightPanel />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+    <div className="relative h-screen w-screen">
+      <div className="absolute h-full w-full p-2">
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={35} className="mr-2 rounded-lg border">
+            <LeftPanel exec={handleExecuteQuery} />
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={65} className="ml-2">
+            <RightPanel />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 z-[-1] h-full w-full object-cover"
+        src="/bg.webm"
+      ></video>
     </div>
   );
 };

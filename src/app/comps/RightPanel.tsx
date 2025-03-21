@@ -6,7 +6,7 @@ import Conversation from "./tabs/Conversation";
 const RightPanel = () => {
   return (
     //conditionally set this relative style
-    <div className="h-full pl-2">
+    <div className="h-full">
       {/* 
         this looks very obnoxious moving it to conversation only
       <div className="absolute bottom-0 left-0 flex w-full justify-center">

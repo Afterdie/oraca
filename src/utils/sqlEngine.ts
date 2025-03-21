@@ -55,17 +55,17 @@ export async function executeQuery(
   duration?: string;
 }> {
   const query = value.trim();
-  const startTime = performance.now();
   let result: RowData[] = [];
-  let endTime = performance.now();
+  let duration = null;
   try {
     //local execution
     if (db) {
       //getting the first index might not be the best plan
+      const startTime = performance.now();
       const res = db.exec(query);
+      duration = performance.now() - startTime;
       if (res.length > 0)
         result = res.length > 0 ? transformSQLResult(db.exec(query)[0]) : [];
-      endTime = performance.now();
       const schema = generateSchema(db);
       //console.log(processSchema(schema[0]));
       setMetadata(processMetadata(schema[0]));
@@ -81,16 +81,16 @@ export async function executeQuery(
         }),
       });
 
-      const res: QueryExecResponseTypes = await response.json();
+      const res = await response.json();
       if (!res.success)
         return { success: false, error: "Failed to perform query" };
       result = res.data || [];
-      endTime = performance.now();
+      duration = res.duration;
     }
     return {
       success: true,
       data: result,
-      duration: (endTime - startTime).toFixed(2),
+      duration: (duration * 1000).toFixed(2),
     };
   } catch (error) {
     if (error instanceof Error) return { success: false, error: error.message };

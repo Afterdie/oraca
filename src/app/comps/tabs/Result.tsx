@@ -15,13 +15,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const Result = () => {
   const val = useSelector((state: RootState) => state.queryOutput);
   const res = val.value;
-  if (!res || res.length === 0)
+  if (!res) return;
+  if (res.length === 0)
     return (
       <div className="text-muted-foreground mb-2 flex justify-between">
         <p>No rows selected</p>
         <p>Executed in {val.duration} milliseconds</p>
       </div>
     );
+
   const rowCount = res.length;
   const columnNames = Object.keys(res[0]);
   const duration = val.duration;
