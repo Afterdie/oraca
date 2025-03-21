@@ -19,36 +19,62 @@ interface RelationshipSchema {
   to_columns: string[];
 }
 
+interface IndexSchema {
+  name: string;
+  columns: string[];
+  unique: boolean;
+}
+
+export interface TableStats {
+  row_count: number;
+  cardinality: Record<string, number>;
+}
 export interface TableSchema {
   columns: ColumnSchema[];
   foreign_keys: ForeignKeySchema[];
   relationships: RelationshipSchema[];
+  indexes: IndexSchema[];
 }
 
-let schema: Record<string, TableSchema> = {
-  oraczen: {
-    columns: [
-      {
-        name: "created_on",
-        type: "TEXT",
-        nullable: false,
+export interface Metadata {
+  schema: Record<string, TableSchema>;
+  stats: Record<string, TableStats>;
+}
+
+let metadata: Metadata = {
+  schema: {
+    oraczen: {
+      columns: [
+        {
+          name: "created_on",
+          type: "TEXT",
+          nullable: false,
+        },
+      ],
+      foreign_keys: [],
+      relationships: [],
+      indexes: [],
+    },
+  },
+  stats: {
+    oraczen: {
+      row_count: 1,
+      cardinality: {
+        created_on: 1.0,
       },
-    ],
-    foreign_keys: [],
-    relationships: [],
+    },
   },
 };
 
-export const getSchema = (): Record<string, TableSchema> => schema;
+export const getMetadata = (): Metadata => metadata;
 
-export const setSchema = (newSchema: Record<string, TableSchema>): void => {
-  schema = newSchema;
+export const setMetadata = (newMetadata: Metadata): void => {
+  metadata = newMetadata;
 };
 
 //this takes in the raw input and translates to db friendly structure
-export const processSchema = (
-  data: QueryExecResult,
-): Record<string, TableSchema> => {
+export const processMetadata = (data: QueryExecResult): Metadata => {
+  //not processing the stats currently
   const transformedSchema: Record<string, TableSchema> = {};
 
   data.values.forEach((row) => {
@@ -65,6 +91,7 @@ export const processSchema = (
         columns: [],
         foreign_keys: [],
         relationships: [],
+        indexes: [],
       };
     }
 
@@ -75,5 +102,8 @@ export const processSchema = (
     });
   });
 
-  return transformedSchema;
+  return {
+    schema: transformedSchema,
+    stats: {},
+  };
 };

@@ -1,5 +1,5 @@
 import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
-import { processSchema, setSchema } from "./schema";
+import { processMetadata, setMetadata } from "./schema";
 import { TableSchema } from "./schema";
 
 /**
@@ -15,13 +15,6 @@ export async function initDB(): Promise<Database> {
   INSERT INTO oraczen DEFAULT VALUES;`;
   db.run(initQuery);
   return db;
-}
-
-//servers response when a schema is requested
-export interface SchemaResponseTypes {
-  success: boolean;
-  schema?: Record<string, TableSchema>;
-  message?: string;
 }
 
 //this has to be any or else the transform function breaks
@@ -75,7 +68,7 @@ export async function executeQuery(
       endTime = performance.now();
       const schema = generateSchema(db);
       //console.log(processSchema(schema[0]));
-      setSchema(processSchema(schema[0]));
+      setMetadata(processMetadata(schema[0]));
     } else {
       const response = await fetch(`${backendURL}execute_query`, {
         method: "POST",

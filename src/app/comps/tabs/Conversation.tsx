@@ -1,18 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  updateChat,
-  RootState,
-  updateQuery,
-  removeMessage,
-} from "@/store/store";
+import { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
-import TextInput, { TextInputProps } from "../TextInput";
+import TextInput from "../TextInput";
 import { Card, CardContent } from "@/components/ui/card";
 import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
-import { getSchema } from "@/utils/schema";
 
 export interface MessageTypes {
   content: string;
@@ -20,68 +14,9 @@ export interface MessageTypes {
 }
 
 const Conversation = () => {
-  const [loading, setLoading] = useState(false);
   const chats = useSelector((state: RootState) => state.chatUpdate.value);
-  const dispatch = useDispatch();
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  const handleGenerate = async (userInput: string, query: string | null) => {
-    dispatch(updateChat([{ content: userInput, time: Date.now() }]));
-    try {
-      setLoading(true);
-      const schema = getSchema();
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ schema, userInput, query }),
-      });
-
-      const result = await response.json();
-
-      if (result.reply) {
-        const cleanedResponse = result.reply.replace(
-          /^```json\s+|```[\s\n]*$/g,
-          "",
-        );
-        try {
-          const parsedResponse = JSON.parse(cleanedResponse);
-
-          if (typeof parsedResponse !== "object" || parsedResponse === null) {
-            throw new Error("AI response was not a valid JSON object.");
-          }
-
-          const message = parsedResponse.message || "No message provided.";
-          dispatch(updateChat([{ content: message, time: Date.now() }]));
-
-          const query = parsedResponse.query;
-          if (query) dispatch(updateQuery(query));
-        } catch (error) {
-          console.error("AI response was not valid JSON");
-          removeLastMessage();
-        }
-      }
-    } catch (error) {
-      if (error instanceof Error)
-        console.error("Failed to get reply", error.message);
-      else console.error("Unknown error while generating reply");
-      removeLastMessage();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const removeLastMessage = () => {
-    dispatch(removeMessage());
-  };
-
-  const props: TextInputProps = {
-    generate: handleGenerate,
-    loading: loading,
-  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -111,7 +46,7 @@ const Conversation = () => {
         )}
 
         <div className="relative flex-1">
-          <TextInput {...props} />
+          <TextInput />
         </div>
       </CardContent>
     </Card>

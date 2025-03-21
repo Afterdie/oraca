@@ -7,7 +7,7 @@ import { RootState, updateQuery } from "@/store/store";
 import Editor from "@monaco-editor/react";
 import { format } from "sql-formatter";
 
-import { getSchema } from "@/utils/schema";
+import { getMetadata } from "@/utils/schema";
 
 //shadcn imports
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,8 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   const reqAutocomplete = async (prompt: string) => {
     try {
       const description = prompt;
-      const dbSchema = getSchema();
+      //maybe editor does not need stats
+      const dbSchema = getMetadata().schema;
       const response = await fetch("/api/gensql", {
         method: "POST",
         headers: {

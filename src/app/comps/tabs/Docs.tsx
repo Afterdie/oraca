@@ -11,7 +11,7 @@ import { useCreateBlockNote } from "@blocknote/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-import { getSchema } from "@/utils/schema";
+import { getMetadata } from "@/utils/schema";
 
 const Docs = () => {
   // Creates a new editor instance.
@@ -36,7 +36,7 @@ const Docs = () => {
       let db_schema = null;
       const connection_string = parsedConfig.connection_string;
       //if the db is local then get schema
-      if (!connection_string) db_schema = getSchema();
+      if (!connection_string) db_schema = getMetadata().schema;
       console.log(db_schema);
       const response = await fetch(`${backendURL}gen/docs`, {
         method: "POST",

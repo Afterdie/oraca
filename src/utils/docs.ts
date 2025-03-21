@@ -1,5 +1,4 @@
 import { PartialBlock } from "@blocknote/core";
-import { getSchema } from "./schema";
 
 const blockNoteBlockTypes: PartialBlock[] = [
   {
@@ -52,10 +51,10 @@ const sqliteDataTypes = [
   },
 ];
 
-export const generateDocumentationFields = () => {
-  const schema = JSON.stringify(getSchema(), null, 2);
-  const datatypes = JSON.stringify(sqliteDataTypes, null, 2);
-  const blocks = JSON.stringify(blockNoteBlockTypes, null, 2);
+// export const generateDocumentationFields = () => {
+//   const schema = JSON.stringify(getSchema(), null, 2);
+//   const datatypes = JSON.stringify(sqliteDataTypes, null, 2);
+//   const blocks = JSON.stringify(blockNoteBlockTypes, null, 2);
 
-  return { schema: schema, datatypes: datatypes, blocks: blocks };
-};
+//   return { schema: schema, datatypes: datatypes, blocks: blocks };
+// };

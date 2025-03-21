@@ -2,7 +2,7 @@ import { configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { Block } from "@blocknote/core";
 import { MessageTypes } from "@/app/comps/tabs/Conversation";
-import { TableSchema } from "@/utils/schema";
+import { Metadata } from "@/utils/schema";
 import { RowData } from "@/utils/sqlEngine";
 
 const inputSlice = createSlice({
@@ -32,28 +32,36 @@ const outputSlice = createSlice({
   },
 });
 
-const startingSchema: Record<string, TableSchema> = {
-  oraczen: {
-    columns: [
-      {
-        name: "created_on",
-        type: "TEXT",
-        nullable: false,
+const startingMetadata: Metadata = {
+  schema: {
+    oraczen: {
+      columns: [
+        {
+          name: "created_on",
+          type: "VARCHAR(100)",
+          nullable: true,
+        },
+      ],
+      foreign_keys: [],
+      relationships: [],
+      indexes: [],
+    },
+  },
+  stats: {
+    oraczen: {
+      row_count: 1,
+      cardinality: {
+        created_on: 1.0,
       },
-    ],
-    foreign_keys: [],
-    relationships: [],
+    },
   },
 };
 
 const schemaSlice = createSlice({
   name: "schema",
-  initialState: { value: startingSchema },
+  initialState: { value: startingMetadata },
   reducers: {
-    updateSchema: (
-      state,
-      action: PayloadAction<Record<string, TableSchema>>,
-    ) => {
+    updateSchema: (state, action: PayloadAction<Metadata>) => {
       state.value = action.payload;
     },
   },

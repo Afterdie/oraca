@@ -1,28 +1,86 @@
 "use client";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, updateUserInput } from "@/store/store";
+import {
+  RootState,
+  updateQuery,
+  removeMessage,
+  updateChat,
+  updateUserInput,
+} from "@/store/store";
+import { getMetadata } from "@/utils/schema";
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-export interface TextInputProps {
-  generate: (userInput: string, query: string | null) => void;
-  loading: boolean;
-}
-const TextInput = ({ generate, loading }: TextInputProps) => {
+const TextInput = () => {
+  const [loading, setLoading] = useState(false);
+  const queryEditorValue = useSelector(
+    (state: RootState) => state.queryInput.value,
+  );
+  const dispatch = useDispatch();
+
+  const getReply = async (userInput: string, query: string | null) => {
+    dispatch(updateChat([{ content: userInput, time: Date.now() }]));
+    setLoading(true);
+
+    const config = sessionStorage.getItem("config");
+    if (!config) return;
+
+    try {
+      const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+      const config = sessionStorage.getItem("config");
+      if (!config) return;
+
+      const parsedConfig = JSON.parse(config);
+      let metadata = null;
+      const connection_string = parsedConfig.connection_string;
+
+      if (!connection_string) metadata = getMetadata();
+
+      console.log({ userInput, query, connection_string, metadata });
+      const response = await fetch(`${backendURL}chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userInput, query, connection_string, metadata }),
+      });
+
+      const result = await response.json();
+      console.log(result);
+
+      if (result.success) {
+        const message = result.data.message || "Nothing much to say.";
+        dispatch(updateChat([{ content: message, time: Date.now() }]));
+
+        const query = result.data.query;
+        if (query) dispatch(updateQuery(query));
+      }
+    } catch (error) {
+      if (error instanceof Error)
+        console.error("Failed to get reply", error.message);
+      else console.error("Unknown error while generating reply");
+      removeLastMessage();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeLastMessage = () => {
+    dispatch(removeMessage());
+  };
   const userInput = useSelector(
     (state: RootState) => state.userInputUpdate.userInput,
   );
-  const dispatch = useDispatch();
 
   const [includeQuery, setIncludeQuery] = useState(false);
   let query: string | null = null;
 
   const handleButtonClick = () => {
     if (userInput.trim() && !loading) {
-      if (includeQuery) query = ""; //get from somewher
-      generate(userInput, query);
+      if (includeQuery) query = queryEditorValue;
+      getReply(userInput, query);
       dispatch(updateUserInput(""));
     }
   };
