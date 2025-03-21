@@ -11,6 +11,7 @@ import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
 export interface MessageTypes {
   content: string;
   time: number;
+  thinking: boolean;
 }
 
 const Conversation = () => {
@@ -30,6 +31,7 @@ const Conversation = () => {
             {chats.map((c, index) => {
               const props: ChatbubbleTypes = {
                 content: c.content,
+                thinking: c.thinking,
                 sender: index % 2 == 0,
               };
               return <Chatbubble key={index} {...props} />;

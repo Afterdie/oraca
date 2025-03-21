@@ -85,6 +85,7 @@ const chatSlice = createSlice({
   initialState: {
     value: [] as MessageTypes[],
     userInput: "" as string,
+    thinking: false,
   },
   reducers: {
     updateChat: (state, action: PayloadAction<MessageTypes[]>) => {

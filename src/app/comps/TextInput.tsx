@@ -10,6 +10,11 @@ import {
 } from "@/store/store";
 import { getMetadata } from "@/utils/schema";
 
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +26,12 @@ const TextInput = () => {
   const dispatch = useDispatch();
 
   const getReply = async (userInput: string, query: string | null) => {
-    dispatch(updateChat([{ content: userInput, time: Date.now() }]));
+    dispatch(
+      updateChat([
+        { content: userInput, time: Date.now(), thinking: false },
+        { content: "Hmmm lemme think", time: Date.now(), thinking: true },
+      ]),
+    );
     setLoading(true);
 
     const config = sessionStorage.getItem("config");
@@ -52,7 +62,10 @@ const TextInput = () => {
 
       if (result.success) {
         const message = result.data.message || "Nothing much to say.";
-        dispatch(updateChat([{ content: message, time: Date.now() }]));
+        removeLastMessage();
+        dispatch(
+          updateChat([{ content: message, time: Date.now(), thinking: false }]),
+        );
 
         const query = result.data.query;
         if (query) dispatch(updateQuery(query));
@@ -74,7 +87,8 @@ const TextInput = () => {
     (state: RootState) => state.userInputUpdate.userInput,
   );
 
-  const [includeQuery, setIncludeQuery] = useState(false);
+  const [includeQuery, setIncludeQuery] = useState(true);
+  const [vis, setVis] = useState(false);
   let query: string | null = null;
 
   const handleButtonClick = () => {
@@ -96,19 +110,27 @@ const TextInput = () => {
         />
         <div className="flex flex-row justify-between">
           <div className="flex gap-2">
+            <HoverCard>
+              <HoverCardTrigger>
+                <Button
+                  onClick={() => setIncludeQuery(!includeQuery)}
+                  className={`rounded-4xl border-2 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400" : "border-slate-400 bg-transparent text-slate-400"}`}
+                  disabled={loading}
+                >
+                  Query
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent className="p-2 text-sm">
+                Enabling this allows Oraca to access the query in the editor
+              </HoverCardContent>
+            </HoverCard>
+
             <Button
-              onClick={() => setIncludeQuery(!includeQuery)}
-              className={`rounded-4xl border-2 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-400" : "border-slate-400 bg-transparent text-slate-400 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400"}`}
+              onClick={() => setVis(!vis)}
+              className={`rounded-4xl border-2 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400 ${vis ? "border-blue-400 bg-blue-100 text-blue-400" : "border-slate-400 bg-transparent text-slate-400"}`}
               disabled={loading}
             >
-              Query
-            </Button>
-            <Button
-              onClick={() => setIncludeQuery(!includeQuery)}
-              className={`rounded-4xl border-2 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-400" : "border-slate-400 bg-transparent text-slate-400 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400"}`}
-              disabled={loading}
-            >
-              Optimise
+              Visualise
             </Button>
           </div>
           <Button

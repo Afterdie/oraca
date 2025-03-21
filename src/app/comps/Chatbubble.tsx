@@ -1,8 +1,9 @@
 export interface ChatbubbleTypes {
   content: string;
+  thinking: boolean;
   sender: boolean;
 }
-const Chatbubble = ({ content, sender }: ChatbubbleTypes) => {
+const Chatbubble = ({ content, thinking, sender }: ChatbubbleTypes) => {
   return (
     <div
       className={`flex w-full items-start ${sender ? "justify-end" : "justify-start"}`}
@@ -13,7 +14,11 @@ const Chatbubble = ({ content, sender }: ChatbubbleTypes) => {
       <div
         className={`${sender ? "bg-secondary max-w-[60%]" : "max-w-[90%]"} h-full rounded-lg p-2 px-4`}
       >
-        {content}
+        <span
+          className={`${thinking ? "text-foreground/60 animate-pulse italic" : ""}`}
+        >
+          {content}
+        </span>
       </div>
     </div>
   );
