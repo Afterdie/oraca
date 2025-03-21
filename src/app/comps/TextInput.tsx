@@ -87,28 +87,36 @@ const TextInput = () => {
 
   return (
     <div className="absolute bottom-0 flex w-full items-end justify-center">
-      <div className="z-50 flex max-h-[190px] w-[70%] max-w-[400px] flex-col gap-2 rounded-3xl border bg-white p-2 transition-all duration-300 ease-in-out hover:-translate-y-2">
+      <div className="bg-muted-foreground/10 z-50 flex max-h-[190px] w-[70%] max-w-[400px] flex-col gap-2 rounded-3xl p-2 transition-all duration-300 ease-in-out hover:-translate-y-2">
         <Textarea
-          className="w-full resize-none border-none pl-2 focus-visible:ring-0"
-          placeholder="Talk to your database"
+          className="w-full resize-none border-none pl-2 drop-shadow-none focus-visible:ring-0"
+          placeholder="Ask Oraca questions about your database 🔍"
           value={userInput}
           onChange={(e) => dispatch(updateUserInput(e.target.value))}
         />
         <div className="flex flex-row justify-between">
-          <Button
-            onClick={() => setIncludeQuery(!includeQuery)}
-            className={`rounded-4xl border-2 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-400" : "border-slate-400 bg-slate-100 text-slate-400 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400"}`}
-            disabled={loading}
-          >
-            Query
-          </Button>
-
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIncludeQuery(!includeQuery)}
+              className={`rounded-4xl border-2 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-400" : "border-slate-400 bg-transparent text-slate-400 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400"}`}
+              disabled={loading}
+            >
+              Query
+            </Button>
+            <Button
+              onClick={() => setIncludeQuery(!includeQuery)}
+              className={`rounded-4xl border-2 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-400" : "border-slate-400 bg-transparent text-slate-400 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400"}`}
+              disabled={loading}
+            >
+              Optimise
+            </Button>
+          </div>
           <Button
             className="rounded-4xl"
             disabled={loading}
             onClick={handleButtonClick}
           >
-            Run
+            run
           </Button>
         </div>
       </div>
