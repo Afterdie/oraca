@@ -15,7 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const Result = () => {
   const val = useSelector((state: RootState) => state.queryOutput);
   const res = val.value;
-  if (!res) return;
+  if (!res)
+    return (
+      <Card className="h-full w-full">
+        {/* add som eimage or something here */}
+      </Card>
+    );
   if (res.length === 0)
     return (
       <div className="text-muted-foreground mb-2 flex justify-between">

@@ -17,7 +17,6 @@ const RightPanel = () => {
           <TabsTrigger value="result">Result</TabsTrigger>
           <TabsTrigger value="schema">Schema</TabsTrigger>
           <TabsTrigger value="docs">Documentation</TabsTrigger>
-          <TabsTrigger value="vis">!!!Visualize</TabsTrigger>
           <TabsTrigger value="chat">Conversation</TabsTrigger>
         </TabsList>
         <TabsContent value="result" className="min-h-0 grow">

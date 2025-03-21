@@ -91,7 +91,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col justify-between p-2">
+    <div className="flex h-full flex-col justify-between gap-2 p-2">
       <div className="flex items-center justify-between">
         {/* add  some type of label showing what db currentonl on*/}
         <h1>Query Editor</h1>
