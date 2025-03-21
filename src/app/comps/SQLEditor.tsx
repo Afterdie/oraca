@@ -18,6 +18,12 @@ export interface SQLEditorProps {
 }
 
 const SQLEditor = ({ exec }: SQLEditorProps) => {
+  const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+  const config = sessionStorage.getItem("config");
+  if (!config) return;
+
+  const parsedConfig = JSON.parse(config);
+
   const value = useSelector((state: RootState) => state.queryInput.value);
   const dispatch = useDispatch();
 
@@ -52,25 +58,24 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   const reqAutocomplete = async (prompt: string) => {
     try {
       const description = prompt;
-      //maybe editor does not need stats
-      const dbSchema = getMetadata().schema;
-      const response = await fetch("/api/gensql", {
+      const connection_string = parsedConfig.connection_string;
+      let schema = null;
+      if (!connection_string) schema = getMetadata().schema;
+      
+      //console.log({ description, connection_string, schema });
+      const response = await fetch(`${backendURL}nlp2sql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ description, dbSchema }),
+        body: JSON.stringify({ description, connection_string, schema }),
       });
 
       const result = await response.json();
 
-      if (result.query) {
-        const cleanedQuery = result.query
-          .replace(/^```sql\s+|```$/g, "")
-          .trim();
-        return cleanedQuery;
-      } else {
-        console.error("Error:", result.error);
+      if (result.success) return result.data;
+      else {
+        console.error("Failed to generate query", result.message);
       }
     } catch (error) {
       if (error instanceof Error)
