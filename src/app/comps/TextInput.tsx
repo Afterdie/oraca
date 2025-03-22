@@ -28,8 +28,16 @@ const TextInput = () => {
   const getReply = async (userInput: string, query: string | null) => {
     dispatch(
       updateChat([
-        { content: userInput, time: Date.now(), thinking: false },
-        { content: "Hmmm lemme think", time: Date.now(), thinking: true },
+        {
+          content: { message: userInput, graph: null },
+          time: Date.now(),
+          thinking: false,
+        },
+        {
+          content: { message: "Hmmm lemme think 🤔...", graph: null },
+          time: Date.now(),
+          thinking: true,
+        },
       ]),
     );
     setLoading(true);
@@ -61,10 +69,16 @@ const TextInput = () => {
       console.log(result);
 
       if (result.success) {
-        const message = result.data.message || "Nothing much to say.";
+        const message: string = result.data.message || "Nothing much to say.";
         removeLastMessage();
         dispatch(
-          updateChat([{ content: message, time: Date.now(), thinking: false }]),
+          updateChat([
+            {
+              content: { message: message, graph: null },
+              time: Date.now(),
+              thinking: false,
+            },
+          ]),
         );
 
         const query = result.data.query;

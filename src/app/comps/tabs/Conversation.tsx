@@ -8,8 +8,12 @@ import TextInput from "../TextInput";
 import { Card, CardContent } from "@/components/ui/card";
 import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
 
+export interface ContentTypes {
+  message: string;
+  graph: null;
+}
 export interface MessageTypes {
-  content: string;
+  content: ContentTypes;
   time: number;
   thinking: boolean;
 }
