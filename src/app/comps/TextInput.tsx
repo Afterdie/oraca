@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { GraphType } from "../page";
 import { VisualiseBubbleProps } from "./VisualiseBubble";
 
 const TextInput = () => {
@@ -134,12 +133,12 @@ const TextInput = () => {
       if (result.success) {
         const data = result.data;
         const message: string = data.message || "Nothing much to say.";
-        console.log(data);
+
         const graph: VisualiseBubbleProps = {
-          graph: data.graph as GraphType,
+          graph: data.graph.toLowerCase(),
           chartData: data.chartData,
         };
-        console.log(data);
+
         removeLastMessage();
         dispatch(
           updateChat([

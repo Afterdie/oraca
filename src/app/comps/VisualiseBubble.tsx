@@ -4,24 +4,22 @@ import { RowData } from "@/utils/sqlEngine";
 //graph imports
 import { AreaGraph, BarGraph, LineGraph, RadialGraph, PieGraph } from "./Graph";
 
-import { GraphType } from "../page";
-
 export interface VisualiseBubbleProps {
-  graph: GraphType;
+  graph: string;
   chartData: RowData[];
 }
 export const VisualiseBubble = ({ graph, chartData }: VisualiseBubbleProps) => {
   const props = { chartData };
   switch (graph) {
-    case GraphType.AREA:
+    case "area":
       return <AreaGraph {...props} />;
-    case GraphType.BAR:
+    case "bar":
       return <BarGraph {...props} />;
-    case GraphType.LINE:
+    case "line":
       return <LineGraph {...props} />;
-    case GraphType.RADIAL:
+    case "radial":
       return <RadialGraph {...props} />;
-    case GraphType.PIE:
+    case "pie":
       return <PieGraph {...props} />;
     default:
       return <div>Unsupported graph type</div>;

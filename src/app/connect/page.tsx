@@ -63,7 +63,9 @@ const Page = () => {
         console.log("not workign cuh");
       }
     } catch (error) {
-      console.error("Something went wrong");
+      if (error instanceof Error)
+        console.error("Failed to connect", error.message);
+      else console.error("Unknown error while connecting");
     } finally {
       setConnecting(false);
     }

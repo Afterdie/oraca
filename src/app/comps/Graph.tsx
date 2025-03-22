@@ -39,7 +39,7 @@ const generateChartConfig = (data: RowData[]) => {
   const match = baseHSL.match(/hsl\((\d+), (\d+)%, (\d+)%\)/);
   if (!match) throw new Error("Invalid HSL format");
 
-  let [_, h, s, l] = match.map(Number);
+  const [, h, s, l] = match.map(Number);
 
   const chartConfig = yKeys.reduce<
     Record<string, { label: string; color: string }>
@@ -180,7 +180,12 @@ const RadialGraph = ({ chartData }: GraphProps) => {
         <PolarAngleAxis dataKey={xKey} />
         <PolarGrid />
         {yKeys.map((key) => (
-          <Radar dataKey={key} fill={config[key]?.color} fillOpacity={0.6} />
+          <Radar
+            key={key}
+            dataKey={key}
+            fill={config[key]?.color}
+            fillOpacity={0.6}
+          />
         ))}
       </RadarChart>
     </ChartContainer>
@@ -192,7 +197,7 @@ const PieGraph = ({ chartData }: GraphProps) => {
     const match = baseHSL.match(/hsl\((\d+), (\d+)%, (\d+)%\)/);
     if (!match) throw new Error("Invalid HSL format");
 
-    let [_, h, s, l] = match.map(Number);
+    const [, h, s, l] = match.map(Number);
 
     return data.map((entry, index) => {
       const shadeOffset = (index - data.length / 2) * 8; // Adjust for contrast

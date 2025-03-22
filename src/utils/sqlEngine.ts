@@ -1,6 +1,5 @@
 import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
 import { processMetadata, setMetadata } from "./schema";
-import { TableSchema } from "./schema";
 
 /**
  * Initializes the SQL.js database for local querying.
@@ -25,14 +24,8 @@ export interface RowData {
     | boolean
     | null
     | Date
-    | Array<any>
-    | Record<string, any>;
-}
-//servers response when a query is executed
-interface QueryExecResponseTypes {
-  success: boolean;
-  message?: string;
-  data?: RowData[];
+    | Array<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+    | Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;

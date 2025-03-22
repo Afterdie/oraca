@@ -1,7 +1,5 @@
 import { ContentTypes } from "./tabs/Conversation";
 import VisualiseBubble from "./VisualiseBubble";
-import { VisualiseBubbleProps } from "./VisualiseBubble";
-import { GraphType } from "../page";
 export interface ChatbubbleTypes {
   content: ContentTypes;
   thinking: boolean;
