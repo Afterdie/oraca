@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { GraphType } from "../page";
+import { VisualiseBubbleProps } from "./VisualiseBubble";
 
 const TextInput = () => {
   const [loading, setLoading] = useState(false);
@@ -42,9 +44,6 @@ const TextInput = () => {
     );
     setLoading(true);
 
-    const config = sessionStorage.getItem("config");
-    if (!config) return;
-
     try {
       const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
       const config = sessionStorage.getItem("config");
@@ -56,7 +55,6 @@ const TextInput = () => {
 
       if (!connection_string) metadata = getMetadata();
 
-      console.log({ userInput, query, connection_string, metadata });
       const response = await fetch(`${backendURL}chat`, {
         method: "POST",
         headers: {
@@ -66,7 +64,6 @@ const TextInput = () => {
       });
 
       const result = await response.json();
-      console.log(result);
 
       if (result.success) {
         const message: string = result.data.message || "Nothing much to say.";
@@ -94,6 +91,79 @@ const TextInput = () => {
     }
   };
 
+  const getGraph = async (userInput: string, query: string | null) => {
+    dispatch(
+      updateChat([
+        {
+          content: { message: userInput, graph: null },
+          time: Date.now(),
+          thinking: false,
+        },
+        {
+          content: {
+            message: "Dotting the dots lining the lines 🧑‍🎨...",
+            graph: null,
+          },
+          time: Date.now(),
+          thinking: true,
+        },
+      ]),
+    );
+    setLoading(true);
+
+    try {
+      const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+      const config = sessionStorage.getItem("config");
+      if (!config) return;
+
+      const parsedConfig = JSON.parse(config);
+      let metadata = null;
+      const connection_string = parsedConfig.connection_string;
+
+      if (!connection_string) metadata = getMetadata();
+
+      const response = await fetch(`${backendURL}graph`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userInput, query, connection_string, metadata }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const data = result.data;
+        const message: string = data.message || "Nothing much to say.";
+        console.log(data);
+        const graph: VisualiseBubbleProps = {
+          graph: data.graph as GraphType,
+          chartData: data.chartData,
+        };
+        console.log(data);
+        removeLastMessage();
+        dispatch(
+          updateChat([
+            {
+              content: {
+                message: message,
+                graph: graph,
+              },
+              time: Date.now(),
+              thinking: false,
+            },
+          ]),
+        );
+      }
+    } catch (error) {
+      if (error instanceof Error)
+        console.error("Failed to get reply", error.message);
+      else console.error("Unknown error while generating reply");
+      removeLastMessage();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const removeLastMessage = () => {
     dispatch(removeMessage());
   };
@@ -108,7 +178,11 @@ const TextInput = () => {
   const handleButtonClick = () => {
     if (userInput.trim() && !loading) {
       if (includeQuery) query = queryEditorValue;
-      getReply(userInput, query);
+      if (vis)
+        //absolutely no reason to query but oh well
+        getGraph(userInput, query);
+      else getReply(userInput, query);
+
       dispatch(updateUserInput(""));
     }
   };

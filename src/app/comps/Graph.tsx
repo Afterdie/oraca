@@ -27,7 +27,7 @@ export interface GraphProps {
 }
 
 //this needs to get the right color somehow
-const baseHSL = "hsl(30, 50%, 40%)";
+const baseHSL = "hsl(24, 95%, 53%)";
 
 const generateChartConfig = (data: RowData[]) => {
   if (data.length === 0) return { xKey: "", yKeys: [], config: {} };
@@ -70,7 +70,6 @@ const AreaGraph = ({ chartData }: GraphProps) => {
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value) => value.slice(0, 3)}
         />
         <ChartTooltip
           cursor={false}
@@ -103,7 +102,6 @@ const BarGraph = ({ chartData }: GraphProps) => {
           tickLine={false}
           tickMargin={10}
           axisLine={false}
-          tickFormatter={(value) => value.slice(0, 3)}
         />
         <ChartTooltip
           cursor={false}
@@ -135,7 +133,6 @@ const LineGraph = ({ chartData }: GraphProps) => {
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value) => value.slice(0, 3)}
         />
         <ChartTooltip
           cursor={false}

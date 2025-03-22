@@ -7,10 +7,11 @@ import { RootState } from "@/store/store";
 import TextInput from "../TextInput";
 import { Card, CardContent } from "@/components/ui/card";
 import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
+import { VisualiseBubbleProps } from "../VisualiseBubble";
 
 export interface ContentTypes {
   message: string;
-  graph: null;
+  graph: VisualiseBubbleProps | null;
 }
 export interface MessageTypes {
   content: ContentTypes;
