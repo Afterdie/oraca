@@ -23,10 +23,14 @@ const Result = () => {
     );
   if (res.length === 0)
     return (
-      <div className="text-muted-foreground mb-2 flex justify-between">
-        <p>No rows selected</p>
-        <p>Executed in {val.duration} milliseconds</p>
-      </div>
+      <Card className="h-full w-full">
+        <CardContent>
+          <div className="text-muted-foreground mb-2 flex justify-between">
+            <p>No rows selected</p>
+            <p>Executed in {val.duration} milliseconds</p>
+          </div>
+        </CardContent>
+      </Card>
     );
 
   const rowCount = res.length;
