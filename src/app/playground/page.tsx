@@ -95,14 +95,6 @@ const Page = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 z-[-1] h-full w-full object-cover"
-        src="/bg.webm"
-      ></video>
     </div>
   );
 };

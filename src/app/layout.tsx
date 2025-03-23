@@ -37,6 +37,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 z-[-1] h-full w-full object-cover"
+            src="/bg.webm"
+          ></video>
           <Toaster richColors />
         </ThemeProvider>
       </body>
