@@ -37,8 +37,8 @@ const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
  * @param connection_string - Connection string for the database. Optional
  * @returns An object containing a success flag of type bool and either the result or an error.
  */
-export async function executeQuery(
-  value: string,
+export const executeQuery = async (
+  query: string,
   db: Database | null,
   connection_string: string | null,
 ): Promise<{
@@ -46,19 +46,18 @@ export async function executeQuery(
   data?: RowData[];
   error?: string;
   duration?: string;
-}> {
-  const query = value.trim();
-  let result: RowData[] = [];
+}> => {
+  let data: RowData[] = [];
   let duration = null;
+  //local execution
   try {
-    //local execution
     if (db) {
       //getting the first index might not be the best plan
       const startTime = performance.now();
       const res = db.exec(query);
       duration = performance.now() - startTime;
       if (res.length > 0)
-        result = res.length > 0 ? transformSQLResult(db.exec(query)[0]) : [];
+        data = res.length > 0 ? transformSQLResult(db.exec(query)[0]) : [];
       const schema = generateSchema(db);
       //console.log(processSchema(schema[0]));
       setMetadata(processMetadata(schema[0]));
@@ -73,23 +72,28 @@ export async function executeQuery(
           connection_string: connection_string,
         }),
       });
+      if (!response.ok)
+        throw new Error(`Invalid server response ${response.status}`);
 
-      const res = await response.json();
-      if (!res.success)
-        return { success: false, error: "Failed to perform query" };
-      result = res.data || [];
-      duration = res.duration * 1000;
+      const result = await response.json();
+      if (!result.success)
+        return {
+          success: false,
+          error: `Failed to perform query: ${result.message}`,
+        };
+      data = result.data || [];
+      duration = result.duration * 1000;
     }
     return {
       success: true,
-      data: result,
+      data: data,
       duration: duration.toFixed(2),
     };
   } catch (error) {
     if (error instanceof Error) return { success: false, error: error.message };
-    else return { success: false, error: "Unknown error" };
+    else return { success: false, error: "Something went wrong" };
   }
-}
+};
 
 // incase opted out of auto schema update make this public
 // error check? tihs is for local db

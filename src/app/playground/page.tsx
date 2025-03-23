@@ -17,11 +17,16 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { toast } from "sonner";
 
 //comps
 import LeftPanel from "../comps/LeftPanel";
 import RightPanel from "../comps/RightPanel";
 
+export interface ConfigTypes {
+  provider: string;
+  connection_string: string | null;
+}
 const Page = () => {
   const router = useRouter();
   const [db, setDB] = useState<Database | null>(null);
@@ -29,6 +34,11 @@ const Page = () => {
   //const [error, setError] = useState<string | null>(null);
 
   const dispatch = useDispatch();
+
+  const [config, setConfig] = useState<ConfigTypes>({
+    connection_string: null,
+    provider: "",
+  });
 
   //conditionally setup db is the config says local
   useEffect(() => {
@@ -40,8 +50,9 @@ const Page = () => {
     }
 
     const config = JSON.parse(storedConfig);
+    setConfig(config);
 
-    if (config.provider === "local") {
+    if (!config.connection_string) {
       async function setupDB() {
         try {
           const d = await initDB();
@@ -54,39 +65,20 @@ const Page = () => {
     }
   }, [router]);
 
-  interface config {
-    provider: string;
-    connection_string: string | null;
-  }
   //if i add connectors then only this needs to be modified
-  const handleExecuteQuery = async (value: string): Promise<void> => {
-    if (!value.trim()) return;
+  const handleExecuteQuery = async (query: string): Promise<void> => {
+    if (!query.trim()) return;
     //prevent default
-    const storedConfig = sessionStorage.getItem("config");
-    if (!storedConfig) {
-      router.push("/connect");
-      return;
-    }
-    //checks which request local or connection
-    const config: config = JSON.parse(storedConfig);
+    const result = await executeQuery(
+      query,
+      config.connection_string ? null : db,
+      config.connection_string,
+    );
 
-    let result;
-    if (config.provider === "local") {
-      if (!db) return; //cna show a modal here
-      result = await executeQuery(value, db, null);
+    if (result.success && result.data && result.duration) {
+      dispatch(updateResult({ value: result.data, duration: result.duration }));
     } else {
-      if (!config.connection_string) return;
-      result = await executeQuery(value, null, config.connection_string);
-    }
-    //const processedSchema = processSchema(result.schema[0]);
-    if (result.success) {
-      if (!result.data || !result.duration) return;
-      const data = result.data;
-      dispatch(updateResult({ value: data, duration: result.duration }));
-      console.log(data, value);
-    } else {
-      //show a toast about failuer
-      console.error(result.error);
+      toast.error(result.error || "Failed to execute Query");
     }
   };
 
