@@ -24,8 +24,11 @@ const TextInput = () => {
 
   const [config, setConfig] = useState<{
     connection_string: string | null;
-    provider: string;
-  } | null>(null);
+    provider: string | null;
+  } | null>({
+    connection_string: null,
+    provider: null,
+  });
 
   useEffect(() => {
     const storedConfig = sessionStorage.getItem("config");

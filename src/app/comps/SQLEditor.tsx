@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, updateQuery } from "@/store/store";
@@ -18,18 +18,39 @@ export interface SQLEditorProps {
 }
 
 const SQLEditor = ({ exec }: SQLEditorProps) => {
-  const value = useSelector((state: RootState) => state.queryInput.value);
-  const dispatch = useDispatch();
+  const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
 
-  const [loading, setLoading] = useState(false);
+  const [config, setConfig] = useState<{
+    connection_string: string | null;
+    provider: string | null;
+  }>({
+    connection_string: null,
+    provider: null,
+  });
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null,
   );
 
+  useEffect(() => {
+    const storedConfig = sessionStorage.getItem("config");
+    if (storedConfig) setConfig(JSON.parse(storedConfig));
+  }, []);
+
+  //clearing the timeout on page unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+    };
+  }, [debounceTimeout]);
+
+  const [loading, setLoading] = useState(false);
+
+  const value = useSelector((state: RootState) => state.queryInput.value);
+  const dispatch = useDispatch();
+
   const handleChange = (newValue: string) => {
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
-    }
+    if (debounceTimeout) clearTimeout(debounceTimeout);
+
     dispatch(updateQuery(newValue));
     const timeout = setTimeout(async () => {
       //get the statements where person wants autofill
@@ -37,8 +58,8 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
       const match = newValue.match(/---(.*?)---/);
       let updatedValue = newValue;
       if (match && !loading) {
-        const prompt = match[1];
         setLoading(true);
+        const prompt = match[1];
         const value = await reqAutocomplete(prompt); // Get cleaned value
         updatedValue = newValue.replace(match[0], value);
       }
@@ -50,18 +71,13 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
   };
 
   const reqAutocomplete = async (prompt: string) => {
+    const description = prompt;
     try {
-      const description = prompt;
-      const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
-      const config = sessionStorage.getItem("config");
-      if (!config) return;
+      if (!config) throw new Error("");
 
-      const parsedConfig = JSON.parse(config);
-      const connection_string = parsedConfig.connection_string;
-      let schema = null;
-      if (!connection_string) schema = getMetadata().schema;
+      const connection_string = config.connection_string;
+      const schema = connection_string ? null : getMetadata().schema;
 
-      //console.log({ description, connection_string, schema });
       const response = await fetch(`${backendURL}nlp2sql`, {
         method: "POST",
         headers: {
@@ -69,24 +85,23 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
         },
         body: JSON.stringify({ description, connection_string, schema }),
       });
-
+      if (!response.ok)
+        throw new Error(`Invalid Server Response: ${response.status}`);
       const result = await response.json();
 
-      if (result.success) return result.data;
-      else {
-        console.error("Failed to generate query", result.message);
-      }
+      return result.success ? result.data || "" : "";
     } catch (error) {
-      if (error instanceof Error)
-        console.error("Failed to autocomplete", error.message);
-      else console.error("Unknown error while autocompleting");
+      console.error(
+        "Autocomplete error:",
+        error instanceof Error ? error.message : "",
+      );
+      return "";
     } finally {
       setLoading(false);
     }
   };
 
   const handleQueryExec = () => {
-    console.log("something fired");
     exec(value);
   };
 
