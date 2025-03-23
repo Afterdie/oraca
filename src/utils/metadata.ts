@@ -6,13 +6,13 @@ interface ColumnSchema {
   nullable: boolean;
 }
 
-interface ForeignKeySchema {
+export interface ForeignKeySchema {
   column: string[];
   references_table: string;
   referenced_column: string[];
 }
 
-interface RelationshipSchema {
+export interface RelationshipSchema {
   from_table: string;
   from_columns: string[];
   to_table: string;

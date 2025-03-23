@@ -1,36 +1,38 @@
-"use client";
-
-import React, { useCallback } from "react";
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
 import ReactFlow, {
-  MiniMap,
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
   BackgroundVariant,
+  Node,
+  Edge,
 } from "reactflow";
+import TableNode from "../TableNode";
 import "reactflow/dist/style.css";
+import { Metadata } from "@/utils/metadata";
+import processSchemaToFlow from "@/utils/flow";
+import { RootState } from "@/store/store";
 
-const initialNodes = [
-  { id: "1", position: { x: 250, y: 5 }, data: { label: "Node 1" } },
-  { id: "2", position: { x: 100, y: 100 }, data: { label: "Node 2" } },
-  { id: "3", position: { x: 400, y: 200 }, data: { label: "Node 3" } },
-];
-
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
+const nodeTypes = { tableNode: TableNode }; // Register custom node
 
 const SchemaFlow = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const metadata: Metadata = useSelector(
+    (state: RootState) => state.schemaUpdate.value,
+  );
+
+  const { nodes, edges }: { nodes: Node[]; edges: Edge[] } = useMemo(
+    () => processSchemaToFlow(metadata),
+    [metadata],
+  );
 
   return (
     <div className="h-full w-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        //onNodesChange={onNodesChange}
+        //onEdgesChange={onEdgesChange}
         fitView
         proOptions={{ hideAttribution: true }}
       >
