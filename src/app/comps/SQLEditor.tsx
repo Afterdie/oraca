@@ -11,6 +11,7 @@ import { getMetadata } from "@/utils/schema";
 
 //shadcn imports
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 //types
 export interface SQLEditorProps {
@@ -91,10 +92,9 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
 
       return result.success ? result.data || "" : "";
     } catch (error) {
-      console.error(
-        "Autocomplete error:",
-        error instanceof Error ? error.message : "",
-      );
+      if (error instanceof Error)
+        toast.error(`Autocomplete error: ${error.message}`);
+      else toast.error("Something went wrong");
       return "";
     } finally {
       setLoading(false);

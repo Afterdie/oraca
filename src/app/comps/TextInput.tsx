@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
 import { VisualiseBubbleProps } from "./VisualiseBubble";
 
 const TextInput = () => {
@@ -93,8 +95,8 @@ const TextInput = () => {
       }
     } catch (error) {
       if (error instanceof Error)
-        console.error("Failed to get reply: ", error.message);
-      else console.error("Something went wrong");
+        toast.error(`Failed to get reply: ${error.message}`);
+      else toast.error("Something went wrong");
       dispatch(removeMessage());
     } finally {
       setLoading(false);
@@ -165,8 +167,8 @@ const TextInput = () => {
       }
     } catch (error) {
       if (error instanceof Error)
-        console.error("Failed to get reply", error.message);
-      else console.error("Something went wrong");
+        toast.error(`Failed to get reply ${error.message}`);
+      else toast.error("Something went wrong");
       dispatch(removeMessage());
     } finally {
       setLoading(false);
