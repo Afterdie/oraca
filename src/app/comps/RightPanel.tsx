@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Docs from "./tabs/Docs";
 import Result from "./tabs/Result";
+import SchemaFlow from "./tabs/SchemaFlow";
 import Conversation from "./tabs/Conversation";
 
 const RightPanel = () => {
@@ -21,6 +22,9 @@ const RightPanel = () => {
         </TabsList>
         <TabsContent value="result" className="min-h-0 grow">
           <Result />
+        </TabsContent>
+        <TabsContent value="schema" className="min-h-0 grow">
+          <SchemaFlow />
         </TabsContent>
         <TabsContent value="docs" className="min-h-0 grow">
           <Docs />
