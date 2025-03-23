@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   RootState,
@@ -20,10 +20,20 @@ import { Button } from "@/components/ui/button";
 import { VisualiseBubbleProps } from "./VisualiseBubble";
 
 const TextInput = () => {
+  const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+
+  const [config, setConfig] = useState<{
+    connection_string: string | null;
+    provider: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const storedConfig = sessionStorage.getItem("config");
+    if (storedConfig) setConfig(JSON.parse(storedConfig));
+  }, []);
+
   const [loading, setLoading] = useState(false);
-  const queryEditorValue = useSelector(
-    (state: RootState) => state.queryInput.value,
-  );
+
   const dispatch = useDispatch();
 
   const getReply = async (userInput: string, query: string | null) => {
@@ -44,15 +54,10 @@ const TextInput = () => {
     setLoading(true);
 
     try {
-      const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
-      const config = sessionStorage.getItem("config");
-      if (!config) return;
+      if (!config) throw new Error("Reconnect to database");
 
-      const parsedConfig = JSON.parse(config);
-      let metadata = null;
-      const connection_string = parsedConfig.connection_string;
-
-      if (!connection_string) metadata = getMetadata();
+      const connection_string = config.connection_string;
+      const metadata = connection_string ? null : getMetadata();
 
       const response = await fetch(`${backendURL}chat`, {
         method: "POST",
@@ -62,11 +67,14 @@ const TextInput = () => {
         body: JSON.stringify({ userInput, query, connection_string, metadata }),
       });
 
+      if (!response.ok)
+        throw new Error(`Invalid server response ${response.status}`);
+
       const result = await response.json();
 
       if (result.success) {
         const message: string = result.data.message || "Nothing much to say.";
-        removeLastMessage();
+        dispatch(removeMessage());
         dispatch(
           updateChat([
             {
@@ -77,14 +85,14 @@ const TextInput = () => {
           ]),
         );
 
-        const query = result.data.query;
-        if (query) dispatch(updateQuery(query));
+        const newQuery = result.data.query;
+        if (newQuery) dispatch(updateQuery(newQuery));
       }
     } catch (error) {
       if (error instanceof Error)
-        console.error("Failed to get reply", error.message);
-      else console.error("Unknown error while generating reply");
-      removeLastMessage();
+        console.error("Failed to get reply: ", error.message);
+      else console.error("Something went wrong");
+      dispatch(removeMessage());
     } finally {
       setLoading(false);
     }
@@ -111,15 +119,10 @@ const TextInput = () => {
     setLoading(true);
 
     try {
-      const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
-      const config = sessionStorage.getItem("config");
-      if (!config) return;
+      if (!config) throw new Error("Reconnect to db");
 
-      const parsedConfig = JSON.parse(config);
-      let metadata = null;
-      const connection_string = parsedConfig.connection_string;
-
-      if (!connection_string) metadata = getMetadata();
+      const connection_string = config.connection_string;
+      const metadata = connection_string ? null : getMetadata();
 
       const response = await fetch(`${backendURL}graph`, {
         method: "POST",
@@ -129,7 +132,11 @@ const TextInput = () => {
         body: JSON.stringify({ userInput, query, connection_string, metadata }),
       });
 
+      if (!response.ok)
+        throw new Error(`Invalid Server Response ${response.status}`);
+
       const result = await response.json();
+
       if (result.success) {
         const data = result.data;
         const message: string = data.message || "Nothing much to say.";
@@ -139,7 +146,7 @@ const TextInput = () => {
           chartData: data.chartData,
         };
 
-        removeLastMessage();
+        dispatch(removeMessage());
         dispatch(
           updateChat([
             {
@@ -156,32 +163,27 @@ const TextInput = () => {
     } catch (error) {
       if (error instanceof Error)
         console.error("Failed to get reply", error.message);
-      else console.error("Unknown error while generating reply");
-      removeLastMessage();
+      else console.error("Something went wrong");
+      dispatch(removeMessage());
     } finally {
       setLoading(false);
     }
   };
 
-  const removeLastMessage = () => {
-    dispatch(removeMessage());
-  };
   const userInput = useSelector(
     (state: RootState) => state.userInputUpdate.userInput,
   );
 
   const [includeQuery, setIncludeQuery] = useState(true);
   const [vis, setVis] = useState(false);
-  let query: string | null = null;
+  const queryEditorValue = useSelector(
+    (state: RootState) => state.queryInput.value,
+  );
 
   const handleButtonClick = () => {
     if (userInput.trim() && !loading) {
-      if (includeQuery) query = queryEditorValue;
-      if (vis)
-        //absolutely no reason to query but oh well
-        getGraph(userInput, query);
-      else getReply(userInput, query);
-
+      const query = includeQuery ? queryEditorValue : null;
+      vis ? getGraph(userInput, query) : getReply(userInput, query);
       dispatch(updateUserInput(""));
     }
   };
