@@ -92,7 +92,7 @@ const TextInput = () => {
 
         const newQuery = result.data.query;
         if (newQuery) dispatch(updateQuery(newQuery));
-      }
+      } else toast.error(`Failed to get reply: ${result.message}`);
     } catch (error) {
       if (error instanceof Error)
         toast.error(`Failed to get reply: ${error.message}`);

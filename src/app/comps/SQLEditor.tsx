@@ -63,6 +63,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
         const prompt = match[1];
         const value = await reqAutocomplete(prompt); // Get cleaned value
         updatedValue = newValue.replace(match[0], value);
+        toast.success("Query generated🧙‍♂️");
       }
       //reducer used here so that the message box has context of the editor
       dispatch(updateQuery(format(updatedValue)));
