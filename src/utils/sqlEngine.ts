@@ -1,5 +1,5 @@
 import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
-import { processMetadata, setMetadata } from "./schema";
+import { processMetadata, setMetadata } from "./metadata";
 
 /**
  * Initializes the SQL.js database for local querying.

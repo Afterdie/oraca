@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import { getMetadata } from "@/utils/schema";
+import { getMetadata } from "@/utils/metadata";
 
 const Docs = () => {
   // Creates a new editor instance.

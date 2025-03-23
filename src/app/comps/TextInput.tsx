@@ -8,7 +8,7 @@ import {
   updateChat,
   updateUserInput,
 } from "@/store/store";
-import { getMetadata } from "@/utils/schema";
+import { getMetadata } from "@/utils/metadata";
 
 import {
   HoverCard,

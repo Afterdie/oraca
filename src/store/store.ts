@@ -2,7 +2,7 @@ import { configureStore, PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { Block } from "@blocknote/core";
 import { MessageTypes } from "@/app/comps/tabs/Conversation";
-import { Metadata } from "@/utils/schema";
+import { Metadata } from "@/utils/metadata";
 import { RowData } from "@/utils/sqlEngine";
 
 const inputSlice = createSlice({

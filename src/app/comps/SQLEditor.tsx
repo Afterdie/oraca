@@ -7,7 +7,7 @@ import { RootState, updateQuery } from "@/store/store";
 import Editor from "@monaco-editor/react";
 import { format } from "sql-formatter";
 
-import { getMetadata } from "@/utils/schema";
+import { getMetadata } from "@/utils/metadata";
 
 //shadcn imports
 import { Button } from "@/components/ui/button";
