@@ -162,19 +162,29 @@ const Page = () => {
                   <ToggleGroupItem value="pg" className="h-full w-full">
                     <Image
                       src="/images/pg.svg"
-                      alt="pg"
-                      width={40}
-                      height={40}
+                      alt="pg_logo"
+                      width={50}
+                      height={50}
                     />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="b" className="h-full w-full">
-                    B
+                  <ToggleGroupItem value="sqlite" className="h-full w-full">
+                    <Image
+                      src="/images/sqlite.svg"
+                      alt="sqlite_logo"
+                      width={70}
+                      height={70}
+                    />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="c" className="h-full w-full">
-                    C
+                  <ToggleGroupItem value="mysql" className="h-full w-full">
+                    <Image
+                      src="/images/mysql.svg"
+                      alt="mysql_logo"
+                      width={80}
+                      height={80}
+                    />
                   </ToggleGroupItem>
                 </ToggleGroup>
-                <div className="flex w-full flex-col gap-2">
+                <div className="flex-co flex w-full gap-2">
                   <Label htmlFor="connectionString">Connection URL</Label>
                   <Input
                     id="connectionString"
