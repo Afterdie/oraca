@@ -4,6 +4,7 @@ import { RootState } from "@/store/store";
 
 import { saveAs } from "file-saver";
 import { utils, writeFile } from "xlsx";
+import Papa from "papaparse";
 
 import {
   Table,
@@ -59,15 +60,11 @@ const Result = () => {
     saveAs(jsonBlob, "export.json");
   };
 
-  // const exportToCSV = () => {
-  //   try {
-  //     const csv = json2csv(res);
-  //     const csvBlob = new Blob([csv], { type: "text/csv" });
-  //     saveAs(csvBlob, "export.csv");
-  //   } catch (error) {
-  //     console.error("CSV export failed:", error);
-  //   }
-  // };
+  const exportToCSV = () => {
+    const csv = Papa.unparse(res);
+    const csvBlob = new Blob([csv], { type: "text/csv" });
+    saveAs(csvBlob, "export.csv");
+  };
 
   const exportToExcel = () => {
     const worksheet = utils.json_to_sheet(res);
@@ -89,48 +86,46 @@ const Result = () => {
               <DropdownMenuLabel>Formats</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={exportToJSON}>JSON</DropdownMenuItem>
-              <DropdownMenuItem>CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToCSV}>CSV</DropdownMenuItem>
               <DropdownMenuItem onClick={exportToExcel}>Excel</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent>
-        <div>
-          <div className="text-muted-foreground mb-2 flex justify-between">
-            <p>{`Displaying ${rowCount} row${rowCount === 1 ? "" : "s"}`}</p>
-            <p>Executed in {duration} milliseconds</p>
-          </div>
-          <div className="border-accent-foreground/45 overflow-hidden rounded-xl border-[1px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {columnNames.map((colName, index) => {
-                    return (
-                      <TableHead key={index} className="bg-muted">
-                        {colName}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {res.map((row, index) => {
+      <CardContent className="h-full w-full overflow-hidden">
+        <div className="text-muted-foreground mb-2 flex justify-between">
+          <p>{`Displaying ${rowCount} row${rowCount === 1 ? "" : "s"}`}</p>
+          <p>Executed in {duration} milliseconds</p>
+        </div>
+        <div className="h-full w-full overflow-auto">
+          <Table className="border-accent-foreground/45 rounded-xl border">
+            <TableHeader>
+              <TableRow>
+                {columnNames.map((colName, index) => {
                   return (
-                    <TableRow key={index}>
-                      {columnNames.map((colName, colIndex) => {
-                        return (
-                          <TableCell key={colIndex}>
-                            {displayableValue(row[colName])}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+                    <TableHead key={index} className="bg-muted">
+                      {colName}
+                    </TableHead>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </div>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {res.map((row, index) => {
+                return (
+                  <TableRow key={index}>
+                    {columnNames.map((colName, colIndex) => {
+                      return (
+                        <TableCell key={colIndex}>
+                          {displayableValue(row[colName])}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
     </Card>
