@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-
+import Image from "next/image";
 import TextInput from "../TextInput";
 import { Card, CardContent } from "@/components/ui/card";
 import Chatbubble, { ChatbubbleTypes } from "../Chatbubble";
@@ -46,9 +46,14 @@ const Conversation = () => {
             <div ref={messagesEndRef} />
           </div>
         ) : (
-          <div className="flex flex-3 flex-col items-center justify-center">
-            <div>image here</div>
-            <div>Start Chatting !</div>
+          <div className="flex flex-3 flex-col items-center justify-center gap-4">
+            <Image
+              src="/images/icons/conversation.gif"
+              alt="Chatting icon"
+              height={100}
+              width={100}
+            />
+            <p className="font-semibold">Oraca says hello 👋</p>
           </div>
         )}
 

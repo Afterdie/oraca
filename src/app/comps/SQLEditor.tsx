@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, updateQuery } from "@/store/store";
 import Editor from "@monaco-editor/react";
 import { format } from "sql-formatter";
+import { Badge } from "@/components/ui/badge";
 
 import { getMetadata } from "@/utils/metadata";
 
@@ -117,7 +118,17 @@ const SQLEditor = () => {
     <div className="flex h-full flex-col justify-between gap-2 p-2">
       <div className="flex items-center justify-between">
         {/* add  some type of label showing what db currentonl on*/}
-        <h1>Query Editor</h1>
+        <div className="flex gap-4">
+          <h1 className="font-semibold">Query Editor</h1>
+          <Badge variant={"secondary"}>
+            <div className="relative">
+              <div className="absolute h-2 w-2 animate-ping rounded-full bg-green-400"></div>
+              <div className="h-2 w-2 rounded-full bg-green-400"></div>
+            </div>
+
+            <p>{config.provider}</p>
+          </Badge>
+        </div>
         <Button onClick={handleExecuteQuery} disabled={loading}>
           Run
         </Button>

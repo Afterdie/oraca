@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import {
   RootState,
@@ -229,11 +230,16 @@ const TextInput = () => {
             </Button>
           </div>
           <Button
-            className="rounded-4xl"
+            className="rounded-full"
             disabled={loading}
             onClick={handleButtonClick}
           >
-            run
+            <Image
+              src="/images/upArrow.svg"
+              alt="send"
+              width={14}
+              height={14}
+            ></Image>
           </Button>
         </div>
       </div>
