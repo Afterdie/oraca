@@ -93,10 +93,12 @@ const Docs = () => {
 
   // Renders the editor instance using a React component.
   return (
-    <>
-      {blocks.length > 0 ? (
-        <Card className="h-full w-full overflow-hidden p-0">
-          <CardContent className="h-full w-full overflow-y-auto p-6 px-0 pb-12">
+    <div className="relative h-full w-full">
+      <Card
+        className={`h-full w-full overflow-hidden p-0 transition-all duration-300 ease-in-out ${blocks.length > 0 ? "" : "bg-transparent"}`}
+      >
+        <CardContent className="h-full w-full overflow-y-auto p-6 px-0 pb-12">
+          {blocks.length > 0 ? (
             <BlockNoteView
               editor={editor}
               theme={"light"}
@@ -104,33 +106,47 @@ const Docs = () => {
                 dispatch(updateDocs(editor.document));
               }}
             />
-          </CardContent>
-        </Card>
-      ) : (
-        //displayed when the user hasnt generate the documentation yet
-        //loading flag shows alternate animations
-        <div className="flex h-full w-full flex-col items-center justify-center gap-6">
-          <div className="flex flex-col items-center justify-between gap-2">
-            <Image
-              src="/images/icons/docs.gif"
-              alt="Documentation icon"
-              height={100}
-              width={100}
-            />
-            <p className="text-secondary font-semibold">
-              Understand your database better 📖
-            </p>
-          </div>
-          <Button
-            onClick={handleGenerate}
-            disabled={loading}
-            variant={"secondary"}
-          >
-            {!loading ? "Generate" : "Working on it ⏰!"}
-          </Button>
-        </div>
-      )}
-    </>
+          ) : (
+            //displayed when the user hasnt generate the documentation yet
+            //loading flag shows alternate animations
+            <>
+              <div className="relative z-50 flex h-full w-full flex-col items-center justify-center gap-6">
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <Image
+                    src="/images/icons/docs.gif"
+                    alt="Documentation icon"
+                    height={150}
+                    width={150}
+                  />
+                  <p className="text-secondary text-3xl font-semibold">
+                    Understand your database better 📖
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleGenerate}
+                  disabled={loading}
+                  variant={"secondary"}
+                >
+                  {!loading ? "Generate" : "Working on it ⏰!"}
+                </Button>
+              </div>
+              <div
+                className="absolute inset-0 z-0 h-full w-full"
+                style={{
+                  WebkitMaskImage:
+                    "radial-gradient(circle, rgba(0,0,0,1) 5%, rgba(0,0,0,0) 100%)",
+                  maskImage:
+                    "radial-gradient(circle, rgba(0,0,0,1) 5%, rgba(0,0,0,0) 100%)",
+                }}
+              >
+                <div className="h-full w-full bg-transparent bg-[radial-gradient(circle,rgba(255,255,255,0.6)_0.7px,transparent_0.7px)] bg-[size:15px_15px]"></div>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
