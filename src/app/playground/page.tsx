@@ -69,11 +69,7 @@ const Page = () => {
   const handleExecuteQuery = async (query: string): Promise<void> => {
     if (!query.trim()) return;
     //prevent default
-    const result = await executeQuery(
-      query,
-      config.connection_string ? null : db,
-      config.connection_string,
-    );
+    const result = await executeQuery(query, config.connection_string);
 
     if (result.success && result.data && result.duration) {
       dispatch(updateResult({ value: result.data, duration: result.duration }));

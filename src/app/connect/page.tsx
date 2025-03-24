@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { updateSchema } from "@/store/store";
 
 import {
   Card,
@@ -30,6 +32,10 @@ const Page = () => {
     connection_string: null,
   });
   const [connecting, setConnecting] = useState(false);
+  const [sqliteFile, setSqliteFile] = useState<File | null>(null);
+
+  //storing the scheam
+  const dispatch = useDispatch();
 
   const handleProviderChange = (value: string) => {
     setConfig((prev) => ({ ...prev, provider: value }));
@@ -40,6 +46,18 @@ const Page = () => {
       ...prev,
       connection_string: e.target.value.trim(),
     }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".sqlite")) {
+      toast.error("Invalid file type. Please upload a .sqlite file.");
+      return;
+    }
+
+    setSqliteFile(file);
   };
 
   const handleConnect = async () => {
@@ -71,7 +89,7 @@ const Page = () => {
 
       if (result.success) {
         sessionStorage.setItem("config", JSON.stringify(config));
-        //pull data for documentation here
+        dispatch(updateSchema(result.data));
         router.push("/playground");
       } else {
         toast.error(`Connection failed: ${result.erro}`);
@@ -101,7 +119,7 @@ const Page = () => {
                 We're bringing more integrations soon!
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex h-full w-full flex-col items-center justify-center gap-10">
+            <CardContent className="flex h-full w-full flex-col items-center justify-between">
               <div className="flex h-full w-full flex-col items-center justify-center gap-4">
                 <ToggleGroup
                   type="single"
@@ -146,16 +164,26 @@ const Page = () => {
           <Card className="h-full">
             <CardHeader>
               <CardTitle>Local Database</CardTitle>
-              <CardDescription>Connect using a local file</CardDescription>
+              <CardDescription>
+                Upload a .sqlite file or start with an in-browser DB
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p>Local database support coming soon.</p>
+            <CardContent className="flex h-full flex-col justify-between">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="sqlite">.sqlite file</Label>
+                <Input
+                  id="sqlite"
+                  type="file"
+                  accept=".sqlite"
+                  onChange={handleFileChange}
+                />
+              </div>
+              <div className="flex w-full justify-end">
+                <Button disabled={connecting || !sqliteFile}>
+                  {connecting ? "Uploading..." : "Use Local"}
+                </Button>
+              </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleConnect} disabled={connecting}>
-                Use Local
-              </Button>
-            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
