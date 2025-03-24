@@ -188,7 +188,8 @@ const TextInput = () => {
   const handleButtonClick = () => {
     if (userInput.trim() && !loading) {
       const query = includeQuery ? queryEditorValue : null;
-      vis ? getGraph(userInput, query) : getReply(userInput, query);
+      if (vis) getGraph(userInput, query);
+      else getReply(userInput, query);
       dispatch(updateUserInput(""));
     }
   };

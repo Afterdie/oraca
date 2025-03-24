@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,7 +22,7 @@ import { Button } from "@/components/ui/button";
 
 import { ConfigTypes } from "../playground/page";
 
-import { initializeDatabase, getDatabaseInstance } from "@/utils/sqlEngine";
+import { initializeDatabase } from "@/utils/sqlEngine";
 import { setMetadata } from "@/utils/metadata";
 
 const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND || ""; // Handle undefined case
@@ -92,7 +91,9 @@ const Page = () => {
         );
         router.push("/playground");
       } catch (error) {
-        toast.error("Failed to load database");
+        if (error instanceof Error)
+          toast.error(`Failed to load database: ${error.message}`);
+        else toast.error("Something went wrong");
       } finally {
         setLoadingDB(false);
       }
@@ -147,7 +148,7 @@ const Page = () => {
             <CardHeader>
               <CardTitle>Select a provider</CardTitle>
               <CardDescription>
-                We're bringing more integrations soon!
+                We&apos;re bringing more integrations soon!
               </CardDescription>
             </CardHeader>
             <CardContent className="flex h-full w-full flex-col items-center justify-between">

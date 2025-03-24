@@ -1,4 +1,4 @@
-import { Edge, Node, Position } from "reactflow";
+import { Edge, Node } from "reactflow";
 import {
   Metadata,
   TableSchema,
