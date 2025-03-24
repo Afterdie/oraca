@@ -197,7 +197,7 @@ const TextInput = () => {
 
   return (
     <div className="absolute bottom-0 flex w-full items-end justify-center">
-      <div className="bg-muted-foreground/10 z-50 flex max-h-[190px] w-[70%] max-w-[400px] flex-col gap-2 rounded-3xl p-2 transition-all duration-300 ease-in-out hover:-translate-y-2">
+      <div className="border-primary/30 bg-accent hover:border-primary/80 z-50 flex max-h-[190px] w-[70%] max-w-[400px] flex-col gap-2 rounded-3xl border-2 p-2 transition-all duration-300 ease-in-out hover:-translate-y-2">
         <Textarea
           className="w-full resize-none border-none pl-2 drop-shadow-none focus-visible:ring-0"
           placeholder="Ask Oraca questions about your database 🔍"
