@@ -16,7 +16,7 @@ const Chatbubble = ({ content, thinking, sender }: ChatbubbleTypes) => {
         <div className="border-accent-foreground mt-[15px] h-4 w-4 rounded-full border bg-gradient-to-tr from-blue-600 to-orange-300"></div>
       )}
       <div
-        className={`${sender ? "bg-secondary max-w-[60%]" : "max-w-[90%]"} h-full rounded-lg p-2 px-4`}
+        className={`${sender ? "bg-secondary max-w-[60%]" : "text-secondary max-w-[90%]"} h-full rounded-lg p-2 px-4`}
       >
         <span
           className={`${thinking ? "text-foreground/60 animate-pulse italic" : ""}`}
@@ -25,7 +25,7 @@ const Chatbubble = ({ content, thinking, sender }: ChatbubbleTypes) => {
           {content.message}
         </span>
         {!thinking && props && (
-          <div className="mt-10 ml-10 w-[400px]">
+          <div className="bg-secondary mt-4 w-[400px] rounded-xl">
             <VisualiseBubble {...props} />
           </div>
         )}

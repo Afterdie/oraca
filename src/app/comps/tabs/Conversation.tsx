@@ -30,9 +30,7 @@ const Conversation = () => {
 
   return (
     <div className="relative h-full w-full">
-      <Card
-        className={`relative z-50 h-full w-full pb-4 transition-all duration-300 ${chats.length > 0 ? "" : "bg-transparent"}`}
-      >
+      <Card className="relative z-50 h-full w-full bg-transparent pb-4 transition-all duration-300">
         <CardContent className="flex h-full w-full flex-col justify-between overflow-hidden">
           {chats.length > 0 ? (
             <div className="flex flex-3 flex-col gap-4 overflow-y-auto">

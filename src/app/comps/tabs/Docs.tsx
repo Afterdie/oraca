@@ -34,7 +34,6 @@ const Docs = () => {
     connection_string: null,
     provider: null,
   });
-  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     const storedConfig = sessionStorage.getItem("config");
@@ -76,6 +75,8 @@ const Docs = () => {
           throw new Error("Failed to generate docs, retrying...");
         }
       } catch (error) {
+        //hacky fix
+        console.log("Error generating Docs:", error);
         attempts++;
         toast.info(`Retrying... (${attempts}/${maxRetries})`);
 

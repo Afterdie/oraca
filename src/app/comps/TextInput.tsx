@@ -197,7 +197,7 @@ const TextInput = () => {
 
   return (
     <div className="absolute bottom-0 flex w-full items-end justify-center">
-      <div className="border-primary/30 bg-accent hover:border-primary/80 z-50 flex max-h-[190px] w-[70%] max-w-[400px] flex-col gap-2 rounded-3xl border-2 p-2 transition-all duration-300 ease-in-out hover:-translate-y-2">
+      <div className="z-50 flex max-h-[190px] w-[70%] max-w-[400px] flex-col gap-2 rounded-3xl bg-white/40 p-2 transition-all duration-300 ease-in-out hover:-translate-y-2 hover:bg-white">
         <Textarea
           className="w-full resize-none border-none pl-2 drop-shadow-none focus-visible:ring-0"
           placeholder="Ask Oraca questions about your database 🔍"
@@ -210,7 +210,7 @@ const TextInput = () => {
               <HoverCardTrigger>
                 <Button
                   onClick={() => setIncludeQuery(!includeQuery)}
-                  className={`rounded-4xl border-2 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400" : "border-slate-400 bg-transparent text-slate-400"}`}
+                  className={`rounded-4xl border-2 ${includeQuery ? "border-blue-400 bg-blue-100 text-blue-400 hover:bg-blue-100" : "border-slate-400 bg-transparent text-slate-400 hover:bg-slate-200"}`}
                   disabled={loading}
                 >
                   Query
@@ -223,7 +223,7 @@ const TextInput = () => {
 
             <Button
               onClick={() => setVis(!vis)}
-              className={`rounded-4xl border-2 hover:border-blue-400 hover:bg-blue-100 hover:text-blue-400 ${vis ? "border-blue-400 bg-blue-100 text-blue-400" : "border-slate-400 bg-transparent text-slate-400"}`}
+              className={`rounded-4xl border-2 ${vis ? "border-blue-400 bg-blue-100 text-blue-400 hover:bg-blue-100" : "border-slate-400 bg-transparent text-slate-400 hover:bg-slate-200"}`}
               disabled={loading}
             >
               Visualise
