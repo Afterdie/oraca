@@ -13,13 +13,12 @@ import { getMetadata } from "@/utils/metadata";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-//types
-export interface SQLEditorProps {
-  exec: (value: string) => void;
-}
+import { executeQuery } from "@/utils/sqlEngine";
+import { updateResult } from "@/store/store";
 
-const SQLEditor = ({ exec }: SQLEditorProps) => {
+const SQLEditor = () => {
   const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+  const dispatch = useDispatch();
 
   const [config, setConfig] = useState<{
     connection_string: string | null;
@@ -46,27 +45,26 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
 
   const [loading, setLoading] = useState(false);
 
-  const value = useSelector((state: RootState) => state.queryInput.value);
-  const dispatch = useDispatch();
+  const query = useSelector((state: RootState) => state.queryInput.value);
 
-  const handleChange = (newValue: string) => {
+  const handleChange = (newQuery: string) => {
     if (debounceTimeout) clearTimeout(debounceTimeout);
 
-    dispatch(updateQuery(newValue));
+    dispatch(updateQuery(newQuery));
     const timeout = setTimeout(async () => {
       //get the statements where person wants autofill
       //this needs some sort of logic to prevent the same on query from getting pushed again and again to the api
-      const match = newValue.match(/---(.*?)---/);
-      let updatedValue = newValue;
+      const match = newQuery.match(/---(.*?)---/);
+      let updatedQuery = newQuery;
       if (match && !loading) {
         setLoading(true);
         const prompt = match[1];
         const value = await reqAutocomplete(prompt); // Get cleaned value
-        updatedValue = newValue.replace(match[0], value);
+        updatedQuery = newQuery.replace(match[0], value);
         toast.success("Query generated🧙‍♂️");
       }
       //reducer used here so that the message box has context of the editor
-      dispatch(updateQuery(format(updatedValue)));
+      dispatch(updateQuery(format(updatedQuery)));
     }, 2000);
 
     setDebounceTimeout(timeout);
@@ -102,8 +100,17 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
     }
   };
 
-  const handleQueryExec = () => {
-    exec(value);
+  //if i add connectors then only this needs to be modified
+  const handleExecuteQuery = async (): Promise<void> => {
+    if (!query.trim()) return;
+    //prevent default
+    const result = await executeQuery(query, config.connection_string);
+
+    if (result.success && result.data && result.duration) {
+      dispatch(updateResult({ value: result.data, duration: result.duration }));
+    } else {
+      toast.error(result.error || "Failed to execute Query");
+    }
   };
 
   return (
@@ -111,7 +118,7 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
       <div className="flex items-center justify-between">
         {/* add  some type of label showing what db currentonl on*/}
         <h1>Query Editor</h1>
-        <Button onClick={handleQueryExec} disabled={loading}>
+        <Button onClick={handleExecuteQuery} disabled={loading}>
           Run
         </Button>
       </div>
@@ -119,8 +126,8 @@ const SQLEditor = ({ exec }: SQLEditorProps) => {
         <Editor
           height="85vh"
           defaultLanguage="sql"
-          value={value}
-          onChange={(newValue) => handleChange(newValue ?? "")}
+          value={query}
+          onChange={(newQuery) => handleChange(newQuery ?? "")}
           options={{
             wordWrap: "on",
             minimap: { enabled: false },
