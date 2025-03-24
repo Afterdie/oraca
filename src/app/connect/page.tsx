@@ -23,6 +23,9 @@ import { Button } from "@/components/ui/button";
 
 import { ConfigTypes } from "../playground/page";
 
+import { initializeDatabase, getDatabaseInstance } from "@/utils/sqlEngine";
+import { setMetadata } from "@/utils/metadata";
+
 const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND || ""; // Handle undefined case
 
 const Page = () => {
@@ -33,6 +36,9 @@ const Page = () => {
   });
   const [connecting, setConnecting] = useState(false);
   const [sqliteFile, setSqliteFile] = useState<File | null>(null);
+
+  const [dbLoaded, setDBLoaded] = useState(false);
+  const [loadingDB, setLoadingDB] = useState(false);
 
   //storing the scheam
   const dispatch = useDispatch();
@@ -48,7 +54,7 @@ const Page = () => {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -60,22 +66,42 @@ const Page = () => {
     setSqliteFile(file);
   };
 
+  //when button is clicked this function has two options
+  // - local db (new or create from)
+  // - online db (using the connection string)
   const handleConnect = async () => {
+    console.log(config);
     if (config.provider !== "local" && config.connection_string === "") return;
 
     if (config.provider === "local") {
-      sessionStorage.setItem(
-        "config",
-        JSON.stringify({ ...config, connection_string: null }),
-      );
-      router.push("/playground");
+      try {
+        setLoadingDB(true);
+        const { schema } = await initializeDatabase(sqliteFile);
+        if (!schema) throw new Error("Failed to init database");
+
+        //this is needed for the global schema that flow page uses
+        dispatch(updateSchema(schema));
+        //this is for the local api calls provides schema for docs. nlp2sql
+        setMetadata(schema);
+
+        setDBLoaded(true);
+        toast.success("Database loaded successfully");
+        sessionStorage.setItem(
+          "config",
+          JSON.stringify({ ...config, connection_string: null }),
+        );
+        router.push("/playground");
+      } catch (error) {
+        toast.error("Failed to load database");
+      } finally {
+        setLoadingDB(false);
+      }
       return;
     }
 
+    //using connection string connecting to a db
     try {
       setConnecting(true);
-
-      if (!backendURL) throw new Error("Backend URL is not set");
 
       const response = await fetch(`${backendURL}validate_connection`, {
         method: "POST",
@@ -88,6 +114,7 @@ const Page = () => {
       const result = await response.json();
 
       if (result.success) {
+        toast.success("Connected to DB successfully");
         sessionStorage.setItem("config", JSON.stringify(config));
         dispatch(updateSchema(result.data));
         router.push("/playground");
@@ -106,7 +133,11 @@ const Page = () => {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
       <div className="text-right">SELECT YOUR DATABASE</div>
-      <Tabs defaultValue="connection" className="h-[400px] w-[400px]">
+      <Tabs
+        defaultValue="connection"
+        className="h-[400px] w-[400px]"
+        onValueChange={handleProviderChange}
+      >
         <TabsList>
           <TabsTrigger value="connection">Connect</TabsTrigger>
           <TabsTrigger value="local">Local</TabsTrigger>
@@ -175,12 +206,20 @@ const Page = () => {
                   id="sqlite"
                   type="file"
                   accept=".sqlite"
+                  disabled={loadingDB}
                   onChange={handleFileChange}
                 />
               </div>
               <div className="flex w-full justify-end">
-                <Button disabled={connecting || !sqliteFile}>
-                  {connecting ? "Uploading..." : "Use Local"}
+                <Button
+                  disabled={loadingDB || dbLoaded}
+                  onClick={handleConnect}
+                >
+                  {loadingDB || dbLoaded
+                    ? "Loading DB..."
+                    : sqliteFile
+                      ? "Use"
+                      : "Create"}
                 </Button>
               </div>
             </CardContent>

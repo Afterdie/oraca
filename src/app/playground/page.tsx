@@ -29,10 +29,6 @@ export interface ConfigTypes {
 }
 const Page = () => {
   const router = useRouter();
-  const [db, setDB] = useState<Database | null>(null);
-  //const [loading, setLoading] = useState(false);
-  //const [error, setError] = useState<string | null>(null);
-
   const dispatch = useDispatch();
 
   const [config, setConfig] = useState<ConfigTypes>({
@@ -51,18 +47,6 @@ const Page = () => {
 
     const config = JSON.parse(storedConfig);
     setConfig(config);
-
-    if (!config.connection_string) {
-      async function setupDB() {
-        try {
-          const d = await initDB();
-          setDB(d);
-        } catch (e) {
-          console.error("Failed to initialize database:", e);
-        }
-      }
-      setupDB();
-    }
   }, [router]);
 
   //if i add connectors then only this needs to be modified

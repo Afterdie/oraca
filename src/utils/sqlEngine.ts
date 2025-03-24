@@ -1,22 +1,11 @@
 import initSqlJs, { Database, SqlJsStatic, QueryExecResult } from "sql.js";
-import { processMetadata, setMetadata } from "./metadata";
+import {
+  getMetadata,
+  Metadata,
+  processMetadata,
+  setMetadata,
+} from "./metadata";
 
-/**
- * Initializes the SQL.js database for local querying.
- * @returns Promise that resolves to Database
- */
-export async function initDB(): Promise<Database> {
-  const SQL: SqlJsStatic = await initSqlJs({
-    locateFile: () => "/sql-wasm.wasm",
-  });
-  const db = new SQL.Database();
-  const initQuery = `CREATE TABLE oraczen (created_on TEXT DEFAULT (datetime('now')));
-  INSERT INTO oraczen DEFAULT VALUES;`;
-  db.run(initQuery);
-  return db;
-}
-
-//this has to be any or else the transform function breaks
 export interface RowData {
   [key: string]:
     | string
@@ -28,18 +17,108 @@ export interface RowData {
     | Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+export interface DBinitTypes {
+  db: Database;
+  schema: Metadata | null;
+}
+
+let dbInstance: Database | null = null;
+
 const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
+const startingMetadata: Metadata = {
+  schema: {
+    oraczen: {
+      columns: [
+        {
+          name: "created_on",
+          type: "VARCHAR(100)",
+          nullable: true,
+        },
+      ],
+      foreign_keys: [],
+      relationships: [],
+      indexes: [],
+    },
+  },
+  stats: {
+    oraczen: {
+      row_count: 1,
+      cardinality: {
+        created_on: 1.0,
+      },
+    },
+  },
+};
+/**
+ * Initializes an in-memory SQLite database.
+ * @returns A promise resolving to the Database instance.
+ */
+export async function initDB(): Promise<DBinitTypes> {
+  //this is shady idk what this will do
+  if (dbInstance) return { db: dbInstance, schema: getMetadata() }; // Prevents reinitialization
+
+  const SQL: SqlJsStatic = await initSqlJs({
+    locateFile: () => "/sql-wasm.wasm",
+  });
+
+  const db = new SQL.Database();
+  db.run(`
+    CREATE TABLE oraczen (created_on TEXT DEFAULT (datetime('now')));
+    INSERT INTO oraczen DEFAULT VALUES;
+  `);
+
+  dbInstance = db;
+  return { db: db, schema: startingMetadata };
+}
 
 /**
- * Executes a SQL query on the given database.
- * @param value - The SQL query string to execute.
- * @param db - The local Database instance. Optional
- * @param connection_string - Connection string for the database. Optional
- * @returns An object containing a success flag of type bool and either the result or an error.
+ * Loads an SQLite database from a file and sets it globally.
+ * @param file - The uploaded SQLite file.
+ * @returns A promise resolving to the Database instance.
+ */
+export async function loadDBFromFile(file: File): Promise<DBinitTypes> {
+  if (!file.name.endsWith(".sqlite") && !file.name.endsWith(".db")) {
+    throw new Error("Invalid file type. Please upload a .sqlite or .db file.");
+  }
+
+  const buffer = await file.arrayBuffer();
+  const SQL: SqlJsStatic = await initSqlJs({
+    locateFile: () => "/sql-wasm.wasm",
+  });
+
+  //////////very important needs a error check here
+  const db = new SQL.Database(new Uint8Array(buffer));
+  const schema = processMetadata(generateSchema(db)[0]);
+  setMetadata(schema);
+  dbInstance = db;
+  return { db: db, schema: schema };
+}
+
+/**
+ * Retrieves the current database instance.
+ * @returns The database instance or null if not initialized.
+ */
+export const getDatabaseInstance = (): Database | null => dbInstance;
+
+/**
+ * Initializes the database based on input.
+ * - If a file is provided, loads it.
+ * - Otherwise, creates a new database.
+ * @param file - Optional SQLite file.
+ * @returns A promise resolving to a database instance.
+ */
+export const initializeDatabase = async (
+  file?: File | null,
+): Promise<DBinitTypes> => (file ? loadDBFromFile(file) : initDB());
+
+/**
+ * Executes a SQL query on the local database or sends it to the backend.
+ * @param query - The SQL query string to execute.
+ * @param connection_string - Connection string for the database. Optional.
+ * @returns An object containing a success flag, data, error, and duration.
  */
 export const executeQuery = async (
   query: string,
-  db: Database | null,
   connection_string: string | null,
 ): Promise<{
   success: boolean;
@@ -47,67 +126,68 @@ export const executeQuery = async (
   error?: string;
   duration?: string;
 }> => {
-  let data: RowData[] = [];
-  let duration = null;
-  //local execution
   try {
+    const db = getDatabaseInstance();
+
     if (db) {
-      //getting the first index might not be the best plan
       const startTime = performance.now();
       const res = db.exec(query);
-      duration = performance.now() - startTime;
-      if (res.length > 0)
-        data = res.length > 0 ? transformSQLResult(db.exec(query)[0]) : [];
-      const schema = generateSchema(db);
-      //console.log(processSchema(schema[0]));
-      setMetadata(processMetadata(schema[0]));
-    } else {
-      const response = await fetch(`${backendURL}execute_query`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: query,
-          connection_string: connection_string,
-        }),
-      });
-      if (!response.ok)
-        throw new Error(`Invalid server response ${response.status}`);
+      const duration = (performance.now() - startTime).toFixed(2);
 
-      const result = await response.json();
-      if (!result.success)
-        return {
-          success: false,
-          error: `Failed to perform query: ${result.message}`,
-        };
-      data = result.data || [];
-      duration = result.duration * 1000;
+      const data = res.length > 0 ? transformSQLResult(res[0]) : [];
+      const schema = generateSchema(db);
+      setMetadata(processMetadata(schema[0]));
+      return { success: true, data, duration };
     }
+
+    // If no local DB, fallback to backend
+    const response = await fetch(`${backendURL}execute_query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, connection_string }),
+    });
+
+    if (!response.ok)
+      throw new Error(`Invalid server response: ${response.status}`);
+
+    const result = await response.json();
+    if (!result.success)
+      return { success: false, error: `Query failed: ${result.message}` };
+
     return {
       success: true,
-      data: data,
-      duration: duration.toFixed(2),
+      data: result.data || [],
+      duration: (result.duration * 1000).toFixed(2),
     };
   } catch (error) {
-    if (error instanceof Error) return { success: false, error: error.message };
-    else return { success: false, error: "Something went wrong" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 };
 
-// incase opted out of auto schema update make this public
-// error check? tihs is for local db
+/**
+ * Generates database schema by extracting table and column metadata.
+ * @param db - The local SQLite database instance.
+ * @returns Query execution result containing schema metadata.
+ */
 const generateSchema = (db: Database): QueryExecResult[] => {
-  return db.exec(
-    "SELECT m.name AS table_name, p.name AS column_name, p.type FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p WHERE m.type = 'table';",
-  );
+  return db.exec(`
+    SELECT m.name AS table_name, p.name AS column_name, p.type
+    FROM sqlite_master AS m
+    JOIN pragma_table_info(m.name) AS p
+    WHERE m.type = 'table';
+  `);
 };
 
-//transform the result to match the backend format
+/**
+ * Transforms SQL.js query results into structured RowData format.
+ * @param result - The SQL.js query execution result.
+ * @returns An array of RowData objects.
+ */
 const transformSQLResult = (result: QueryExecResult): RowData[] => {
-  const { columns, values } = result;
-
-  return values.map((row) => {
-    return Object.fromEntries(columns.map((col, index) => [col, row[index]]));
-  });
+  return result.values.map((row) =>
+    Object.fromEntries(result.columns.map((col, index) => [col, row[index]])),
+  );
 };

@@ -32,34 +32,9 @@ const outputSlice = createSlice({
   },
 });
 
-const startingMetadata: Metadata = {
-  schema: {
-    oraczen: {
-      columns: [
-        {
-          name: "created_on",
-          type: "VARCHAR(100)",
-          nullable: true,
-        },
-      ],
-      foreign_keys: [],
-      relationships: [],
-      indexes: [],
-    },
-  },
-  stats: {
-    oraczen: {
-      row_count: 1,
-      cardinality: {
-        created_on: 1.0,
-      },
-    },
-  },
-};
-
 const schemaSlice = createSlice({
   name: "schema",
-  initialState: { value: startingMetadata },
+  initialState: { value: {} as Metadata },
   reducers: {
     updateSchema: (state, action: PayloadAction<Metadata>) => {
       state.value = action.payload;
