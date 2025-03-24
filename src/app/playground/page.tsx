@@ -26,7 +26,7 @@ const Page = () => {
     //incase the connection string does not exist send user back to connect page
     const storedConfig = sessionStorage.getItem("config");
     if (!storedConfig) {
-      router.push("/connect");
+      router.push("/");
       return;
     }
   }, [router]);
