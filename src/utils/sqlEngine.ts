@@ -128,7 +128,8 @@ export const executeQuery = async (
 }> => {
   try {
     const db = getDatabaseInstance();
-
+    if (!connection_string && !db)
+      throw new Error("DB instance lost. Restart session");
     if (db) {
       const startTime = performance.now();
       const res = db.exec(query);

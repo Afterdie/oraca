@@ -2,6 +2,9 @@
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
+import { saveAs } from "file-saver";
+import { utils, writeFile } from "xlsx";
+
 import {
   Table,
   TableBody,
@@ -10,17 +13,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Result = () => {
   const val = useSelector((state: RootState) => state.queryOutput);
   const res = val.value;
+
   if (!res)
     return (
       <Card className="h-full w-full">
-        {/* add som eimage or something here */}
+        {/* add some image or placeholder here */}
       </Card>
     );
+
   if (res.length === 0)
     return (
       <Card className="h-full w-full">
@@ -37,10 +51,49 @@ const Result = () => {
   const columnNames = Object.keys(res[0]);
   const duration = val.duration;
 
+  // Export Handlers
+  const exportToJSON = () => {
+    const jsonBlob = new Blob([JSON.stringify(res, null, 2)], {
+      type: "application/json",
+    });
+    saveAs(jsonBlob, "export.json");
+  };
+
+  // const exportToCSV = () => {
+  //   try {
+  //     const csv = json2csv(res);
+  //     const csvBlob = new Blob([csv], { type: "text/csv" });
+  //     saveAs(csvBlob, "export.csv");
+  //   } catch (error) {
+  //     console.error("CSV export failed:", error);
+  //   }
+  // };
+
+  const exportToExcel = () => {
+    const worksheet = utils.json_to_sheet(res);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    writeFile(workbook, "export.xlsx");
+  };
+
   return (
     <Card className="h-full w-full gap-2">
       <CardHeader>
-        <CardTitle>Queried Results</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Queried Results</CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>Export</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Formats</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={exportToJSON}>JSON</DropdownMenuItem>
+              <DropdownMenuItem>CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToExcel}>Excel</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </CardHeader>
       <CardContent>
         <div>
