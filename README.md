@@ -26,7 +26,7 @@ Build using NextJS for fronend, FastAPI for backend, TailwindCSS for styling, sh
 
 ## Context
 
-The model does have access to the data itself making it scalable and compliant with zero-trust idelogies. Here's the format of the data shared with the model.
+The model does not have access to the data itself making it scalable and compliant with zero-trust idelogies. Here's the format of the data shared with the model.
 
 ```
 "data": {
