@@ -5,7 +5,7 @@ import { RootState } from "@/store/store";
 import { saveAs } from "file-saver";
 import { utils, writeFile } from "xlsx";
 import Papa from "papaparse";
-
+import Image from "next/image";
 import {
   Table,
   TableBody,
@@ -31,9 +31,34 @@ const Result = () => {
 
   if (!res)
     return (
-      <Card className="h-full w-full">
-        {/* add some image or placeholder here */}
-      </Card>
+      <div className="relative flex h-full w-full justify-center">
+        <div className="text-secondary relative z-50 flex h-[80%] flex-col items-center justify-center gap-2">
+          <div className="flex flex-col items-center justify-center gap-4">
+            <Image
+              src="/images/icons/result.gif"
+              alt="Chatting icon"
+              height={150}
+              width={150}
+              priority
+            />
+            <h2 className="text-3xl font-semibold">Start Querying 📝</h2>
+          </div>
+          <p className="italic opacity-70">
+            Type ---message--- to generate queries
+          </p>
+        </div>
+        <div
+          className="absolute inset-0 z-0 h-full w-full"
+          style={{
+            WebkitMaskImage:
+              "radial-gradient(circle, rgba(0,0,0,1) 5%, rgba(0,0,0,0) 100%)",
+            maskImage:
+              "radial-gradient(circle, rgba(0,0,0,1) 5%, rgba(0,0,0,0) 100%)",
+          }}
+        >
+          <div className="h-full w-full bg-transparent bg-[radial-gradient(circle,rgba(255,255,255,0.6)_0.7px,transparent_0.7px)] bg-[size:15px_15px]"></div>
+        </div>
+      </div>
     );
 
   if (res.length === 0)
