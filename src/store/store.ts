@@ -68,7 +68,7 @@ const chatSlice = createSlice({
     },
     removeMessage: (state, action: PayloadAction<number>) => {
       if (action.payload > 0 && action.payload <= state.value.length) {
-        state.value.splice(0, action.payload);
+        state.value.splice(-action.payload, action.payload);
       }
     },
     updateUserInput: (state, action: PayloadAction<string>) => {
