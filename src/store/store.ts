@@ -66,9 +66,9 @@ const chatSlice = createSlice({
     updateChat: (state, action: PayloadAction<MessageTypes[]>) => {
       state.value = [...state.value, ...action.payload];
     },
-    removeMessage: (state) => {
-      if (state.value.length > 0) {
-        state.value.pop(); // Remove last entry from array
+    removeMessage: (state, action: PayloadAction<number>) => {
+      if (action.payload > 0 && action.payload <= state.value.length) {
+        state.value.splice(0, action.payload);
       }
     },
     updateUserInput: (state, action: PayloadAction<string>) => {

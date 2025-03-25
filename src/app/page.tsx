@@ -184,7 +184,9 @@ const Page = () => {
                   </ToggleGroupItem>
                 </ToggleGroup>
                 <div className="flex-co flex w-full gap-2">
-                  <Label htmlFor="connectionString">Connection URL</Label>
+                  <Label htmlFor="connectionString" className="text-right">
+                    Connection URL
+                  </Label>
                   <Input
                     id="connectionString"
                     onChange={handleConnectionChange}

@@ -42,7 +42,7 @@ const TextInput = () => {
 
   const dispatch = useDispatch();
 
-  const getReply = async (userInput: string, query: string | null) => {
+  const addThinkingMessage = (userInput: string, thinkingMessage: string) => {
     dispatch(
       updateChat([
         {
@@ -51,12 +51,16 @@ const TextInput = () => {
           thinking: false,
         },
         {
-          content: { message: "Hmmm lemme think 🤔...", graph: null },
+          content: { message: thinkingMessage, graph: null },
           time: Date.now(),
           thinking: true,
         },
       ]),
     );
+  };
+
+  const getReply = async (userInput: string, query: string | null) => {
+    addThinkingMessage(userInput, "Hmmm lemme think 🤔...");
     setLoading(true);
 
     try {
@@ -80,7 +84,7 @@ const TextInput = () => {
 
       if (result.success) {
         const message: string = result.data.message || "Nothing much to say.";
-        dispatch(removeMessage());
+        dispatch(removeMessage(1));
         dispatch(
           updateChat([
             {
@@ -98,34 +102,18 @@ const TextInput = () => {
       if (error instanceof Error)
         toast.error(`Failed to get reply: ${error.message}`);
       else toast.error("Something went wrong");
-      dispatch(removeMessage());
+      dispatch(removeMessage(2));
     } finally {
       setLoading(false);
     }
   };
 
   const getGraph = async (userInput: string, query: string | null) => {
-    dispatch(
-      updateChat([
-        {
-          content: { message: userInput, graph: null },
-          time: Date.now(),
-          thinking: false,
-        },
-        {
-          content: {
-            message: "Dotting the dots lining the lines 🧑‍🎨...",
-            graph: null,
-          },
-          time: Date.now(),
-          thinking: true,
-        },
-      ]),
-    );
+    addThinkingMessage(userInput, "Dotting the dots lining the lines 🧑‍🎨...");
     setLoading(true);
 
     try {
-      if (!config) throw new Error("Reconnect to db");
+      if (!config?.connection_string) throw new Error("Reconnect to db");
 
       const connection_string = config.connection_string;
       const metadata = connection_string ? null : getMetadata();
@@ -152,7 +140,7 @@ const TextInput = () => {
           chartData: data.chartData,
         };
 
-        dispatch(removeMessage());
+        dispatch(removeMessage(1));
         dispatch(
           updateChat([
             {
@@ -170,7 +158,7 @@ const TextInput = () => {
       if (error instanceof Error)
         toast.error(`Failed to get reply ${error.message}`);
       else toast.error("Something went wrong");
-      dispatch(removeMessage());
+      dispatch(removeMessage(2));
     } finally {
       setLoading(false);
     }
