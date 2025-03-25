@@ -12,6 +12,9 @@ const openhours = localFont({
 export const metadata: Metadata = {
   title: "Oraca",
   description: "AI supercharged SQL tool. Visualisations, Query Generation",
+  icons: {
+    icon: "/images/favicon.ico",
+  },
 };
 
 export default function RootLayout({

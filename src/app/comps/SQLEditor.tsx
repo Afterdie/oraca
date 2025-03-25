@@ -7,7 +7,7 @@ import { RootState, updateQuery } from "@/store/store";
 import Editor from "@monaco-editor/react";
 import { format } from "sql-formatter";
 import { Badge } from "@/components/ui/badge";
-
+import Link from "next/link";
 import { getMetadata } from "@/utils/metadata";
 
 //shadcn imports
@@ -120,14 +120,16 @@ const SQLEditor = () => {
         {/* add  some type of label showing what db currentonl on*/}
         <div className="flex gap-4">
           <h1 className="font-semibold">Query Editor</h1>
-          <Badge variant={"secondary"}>
-            <div className="relative">
-              <div className="absolute h-2 w-2 animate-ping rounded-full bg-green-400"></div>
-              <div className="h-2 w-2 rounded-full bg-green-400"></div>
-            </div>
+          <Link href={"/"}>
+            <Badge variant={"secondary"}>
+              <div className="relative">
+                <div className="absolute h-2 w-2 animate-ping rounded-full bg-green-400"></div>
+                <div className="h-2 w-2 rounded-full bg-green-400"></div>
+              </div>
 
-            <p>{config.provider}</p>
-          </Badge>
+              <p>{config.provider}</p>
+            </Badge>
+          </Link>
         </div>
         <Button onClick={handleExecuteQuery} disabled={loading}>
           Run
