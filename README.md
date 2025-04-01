@@ -2,6 +2,7 @@
 
 AI-Powered Data Visualization Agent for SQL Generation, Analysis and Data Exploration.
 
+[Demo](https://www.youtube.com/watch?v=l2cT9td9YQM)
 ## Features
 
 - Self-Service Data Exploration: Enable business users to explore data without
