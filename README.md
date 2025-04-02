@@ -43,64 +43,107 @@ Below is the generalised architecture of the application.
 ![diagram-export-3-26-2025-3_08_41-PM](https://github.com/user-attachments/assets/de901d6d-5878-4e5a-8115-97153ef650d3)
 
 ## Tech Stack
+- **Frontend**:
 
-### Frontend - NextJS, TypeScript, Redux, TailwindCSS, shadCN
-### Backend - Python, fastAPI, sqlAlchemy
+  - Next.js 15
+  - React 19
+  - TailwindCSS
+  - shadcn/ui components
+  - Redux for state management
+  - BlockNote for rich text editing
+  - Recharts for data visualization
+  - ReactFlow for flow diagrams
 
-## Context
+- **Backend**:
+  - FastAPI
+  - SQLAlchemy
+  - Gemini 1.5-flash for AI processing
 
-The model does not have access to the data itself making it scalable and compliant with zero-trust ideologies. Here's the format of the data shared with the model.
+## Architecture
 
-```
-"data": {
-        "schema": {
-            "[tableName]": {
-                "columns": [
-                    {
-                        "name": "[colName]",
-                        "type": "[datatype]",
-                        "nullable": [boolean]
-                    }
-                ],
-                "foreign_keys": [],
-                "relationships": [],
-                "indexes": []
-            },
-        },
-        "stats": {
-            "[tableName]": {
-                "row_count": [integercount],
-                "cardinality": {
-                    "[colName]": [cardinalityValue]
-                }
-            }
+### AI Processing
+
+The application uses Gemini 1.5-flash for processing natural language inputs and generating SQL queries. The model operates with a zero-trust ideology, meaning it doesn't have direct access to the actual data.
+
+### Data Context
+
+The model receives structured information about your database in the following format:
+
+```json
+{
+  "data": {
+    "schema": {
+      "[tableName]": {
+        "columns": [
+          {
+            "name": "[colName]",
+            "type": "[datatype]",
+            "nullable": [boolean]
+          }
+        ],
+        "foreign_keys": [],
+        "relationships": [],
+        "indexes": []
+      }
+    },
+    "stats": {
+      "[tableName]": {
+        "row_count": [integercount],
+        "cardinality": {
+          "[colName]": [cardinalityValue]
         }
+      }
     }
+  }
+}
 ```
 
-### Schema
+### Data Flow and Schema Management
 
-This stores the context neccessary for the model to write queries for cross-table joins, generate documentation and for answering questions.
+The application handles database schema through a streamlined process: when connecting to a database (local or remote), the schema is extracted and processed into a structured format containing table definitions, relationships, and statistics. This processed schema is stored in Redux state management and distributed to various components including the AI model for query generation, visualization system for schema diagrams, and documentation generator. The schema is automatically updated after query execution, ensuring consistency between the database state and its representation throughout the application.
 
-### Stats
+### Performance Optimization
 
-Stores information useful for generation of indexes.
+The system includes an intelligent indexing system that:
 
-Creation of Index can be done with a rule based system -
+- Tracks query execution frequency and times
+- Identifies sequential scans
+- Analyzes column cardinality
+- Suggests optimal indexes based on query patterns
 
-- Create a list of queries executed and store frequency and execution times
-- Sort the list based on frequency
-- Sort the list based on execution time
-- Determine if the query is Seq Scan(scanning sequentially or using a preexisting index)
-- To determine the columns that can be indexed in order to increase performance we pattern match columns that appear after WHERE
-- Determine cardinality(uniqueness of values) of these columns. Column with highly repeated values do not benefit from a index.
+## Getting Started
+Clone the repo
+
 ```
-        "stats": {
-            "[tableName]": {
-                "row_count": [integercount],
-                "cardinality": {
-                    "[colName]": [cardinalityValue]
-                }
-            }
-        }
+git clone https://github.com/Afterdie/oraca.git
 ```
+
+### Local variables
+Add .env.local file to the root of the project folder
+To get the backend url run the backend by following the instructions [here](https://github.com/afterdie/oraca-backend)
+```
+NEXT_PUBLIC_QUERY_BACKEND=your_backend_url_here
+```
+### Install dependencies
+
+The project uses npm
+
+```
+npm install
+```
+
+### Start dev server
+
+```
+npm run dev
+```
+
+Visit local host link in the terminal to see the website
+
+### Create Build
+
+```
+npm run build
+```
+
+Thanks for visiting 😺
