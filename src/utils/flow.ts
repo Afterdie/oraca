@@ -9,9 +9,9 @@ import {
 const processSchemaToFlow = (
   metadata: Metadata,
 ): { nodes: Node[]; edges: Edge[] } => {
-  if (!metadata || !metadata.schema) return { nodes: [], edges: [] };
+  if (!metadata || !metadata.local_schema) return { nodes: [], edges: [] };
 
-  const nodes: Node[] = Object.entries<TableSchema>(metadata.schema).map(
+  const nodes: Node[] = Object.entries<TableSchema>(metadata.local_schema).map(
     ([tableName, tableData], index) => ({
       id: tableName,
       position: { x: 200 * index, y: 100 + (index % 2) * 200 }, // Spread out nodes
@@ -26,7 +26,7 @@ const processSchemaToFlow = (
 
   const edges: Edge[] = [];
 
-  Object.entries<TableSchema>(metadata.schema).forEach(
+  Object.entries<TableSchema>(metadata.local_schema).forEach(
     ([tableName, tableData]) => {
       // Process foreign keys
       tableData.foreign_keys.forEach((fk: ForeignKeySchema) => {

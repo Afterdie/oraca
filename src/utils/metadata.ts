@@ -37,12 +37,12 @@ export interface TableSchema {
 }
 
 export interface Metadata {
-  schema: Record<string, TableSchema>;
+  local_schema: Record<string, TableSchema>;
   stats: Record<string, TableStats>;
 }
 
 let metadata: Metadata = {
-  schema: {
+  local_schema: {
     oraczen: {
       columns: [
         {
@@ -103,7 +103,7 @@ export const processMetadata = (data: QueryExecResult): Metadata => {
   });
 
   return {
-    schema: transformedSchema,
+    local_schema: transformedSchema,
     stats: {},
   };
 };

@@ -53,7 +53,6 @@ const Conversation = () => {
                 alt="Chatting icon"
                 height={150}
                 width={150}
-                priority
               />
               <p className="text-secondary text-3xl font-semibold">
                 Oraca says hello 👋

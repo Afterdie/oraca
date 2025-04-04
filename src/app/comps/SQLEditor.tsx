@@ -61,6 +61,7 @@ const SQLEditor = () => {
         setLoading(true);
         const prompt = match[1];
         const value = await reqAutocomplete(prompt); // Get cleaned value
+        if (value == "") return;
         updatedQuery = newQuery.replace(match[0], value);
         toast.success("Query generated🧙‍♂️");
       }
@@ -77,14 +78,16 @@ const SQLEditor = () => {
       if (!config) throw new Error("");
 
       const connection_string = config.connection_string;
-      const schema = connection_string ? null : getMetadata().schema;
+      const local_schema = connection_string
+        ? null
+        : getMetadata().local_schema;
 
       const response = await fetch(`${backendURL}nlp2sql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ description, connection_string, schema }),
+        body: JSON.stringify({ description, connection_string, local_schema }),
       });
       if (!response.ok)
         throw new Error(`Invalid Server Response: ${response.status}`);

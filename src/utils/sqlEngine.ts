@@ -26,7 +26,7 @@ let dbInstance: Database | null = null;
 
 const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
 const startingMetadata: Metadata = {
-  schema: {
+  local_schema: {
     oraczen: {
       columns: [
         {

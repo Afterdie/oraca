@@ -51,12 +51,14 @@ const Docs = () => {
         dispatch(loadDocs(true));
 
         const connection_string = config.connection_string;
-        const schema = connection_string ? null : getMetadata().schema;
+        const local_schema = connection_string
+          ? null
+          : getMetadata().local_schema;
 
         const response = await fetch(`${backendURL}docs`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ connection_string, schema }),
+          body: JSON.stringify({ connection_string, local_schema }),
         });
 
         if (!response.ok)
