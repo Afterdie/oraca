@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, updateQuery } from "@/store/store";
+import { RootState, updateQuery, updateResult } from "@/store/store";
 import Editor from "@monaco-editor/react";
 import { format } from "sql-formatter";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 import { executeQuery } from "@/utils/sqlEngine";
-import { updateResult } from "@/store/store";
 
 const SQLEditor = () => {
   const backendURL = process.env.NEXT_PUBLIC_QUERY_BACKEND;
@@ -110,8 +109,14 @@ const SQLEditor = () => {
     //prevent default
     const result = await executeQuery(query, config.connection_string);
 
-    if (result.success && result.data && result.duration) {
+    if (result.success && result.data && result.duration && result.query) {
       dispatch(updateResult({ value: result.data, duration: result.duration }));
+      const patchedQuery = format(result.query);
+      if (patchedQuery && query !== patchedQuery) {
+        console.log(patchedQuery, "-break-", query);
+        toast.success("Fixed the query using semantic search");
+        handleChange(format(patchedQuery));
+      }
     } else {
       toast.error(result.error || "Failed to execute Query");
     }

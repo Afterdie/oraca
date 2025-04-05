@@ -125,6 +125,7 @@ export const executeQuery = async (
   data?: RowData[];
   error?: string;
   duration?: string;
+  query?: string;
 }> => {
   try {
     const db = getDatabaseInstance();
@@ -152,13 +153,11 @@ export const executeQuery = async (
       throw new Error(`Invalid server response: ${response.status}`);
 
     const result = await response.json();
-    if (!result.success)
-      return { success: false, error: `Query failed: ${result.message}` };
-
     return {
       success: true,
       data: result.data || [],
       duration: (result.duration * 1000).toFixed(2),
+      query: result.query,
     };
   } catch (error) {
     return {
