@@ -20,6 +20,7 @@ https://github.com/user-attachments/assets/d413f9e4-2166-49bd-b403-bc399e4e5fca
 by last month’s data?"
 - 📝 **AI-Powered Documentation**: Automatically generate documentation with example queries
 ![docs](https://github.com/user-attachments/assets/2be92aa8-e167-4440-a244-e191c5251875)
+- 💭 **Semantic Search** — intelligently replaces values in WHERE clauses by semantically matching string literals to closest known values using vector embeddings.
 - 🔄 **Multi-Modal Output**: View your data in various formats including tables, charts, and text
 - 🗣️ **Talk to your database**
 ![talk](https://github.com/user-attachments/assets/d583a227-baf3-48ef-ba67-8a4f7d902d86)
@@ -40,8 +41,7 @@ Link to [oraca-backend](http://github.com/afterdie/oraca-backend).
 ## Architecture
 
 Below is the generalised architecture of the application.
-![diagram-export-3-26-2025-3_08_41-PM](https://github.com/user-attachments/assets/de901d6d-5878-4e5a-8115-97153ef650d3)
-
+![diagram-export-4-6-2025-12_27_40-AM](https://github.com/user-attachments/assets/9080fa5f-8302-4d65-b4fc-42b1d06d22c6)
 ## Tech Stack
 - **Frontend**:
 
